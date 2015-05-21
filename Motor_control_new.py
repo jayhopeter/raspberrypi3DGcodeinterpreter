@@ -110,7 +110,7 @@ def Motor_StepThree(stepper1, step1, stepper2, step2,stepper3,step3, speed):
         micro_step2=total_micro_step/step2;
         micro_step3=total_micro_step/step3;
 
-    T=sqrt(step1**2+step2**2)/speed;      #total time
+    T=sqrt(step1**2+step2**2+step3**2)/speed;      #total time
     dt=T/total_micro_step;                #time delay every micro_step
     
     for i in range(1,total_micro_step+1):    #i is the iterator for the micro_step. i cannot start from 0
@@ -124,9 +124,9 @@ def Motor_StepThree(stepper1, step1, stepper2, step2,stepper3,step3, speed):
             time_laps+=dt/4.0;
 
         if ((i % micro_step3)==0):#Ext motor need to turn one step
-            stepper3.move(dir3,1,dt/4.0);            
+            stepper3.move(dir3,1,dt/4.0);
+            time_laps+=dt/4.0;
         
         time.sleep(dt-time_laps);
 
     return 0;
-
