@@ -117,6 +117,9 @@ def Motor_StepThree(stepper1, step1, stepper2, step2,stepper3,step3, speed):
         if ((i % micro_step2)==0):#motor 2 need to turn one step
             stepper2.move(dir2,1,dt/4.0);
             time_laps+=dt/4.0;
+
+        if ((i % micro_step3)==0):#Ext motor need to turn one step
+            stepper3.move(dir3,1,dt/4.0);            
         
         time.sleep(dt-time_laps);
 
