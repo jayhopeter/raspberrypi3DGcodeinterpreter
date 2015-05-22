@@ -1,3 +1,4 @@
+
 import RPi.GPIO as GPIO
 import Motor_control_new
 from Bipolar_Stepper_Motor_Class_new import Bipolar_Stepper_Motor
@@ -229,7 +230,8 @@ try:#read and execute G code
                 moveto(MX,x_pos,dx,MY,y_pos,dy,speed,engraving);
             elif(lines.index('X') < 0): #Extruder only
                 ext_pos = ExtPosition(lines);
-                stepsExt = int(round(ext_pos/dext))-MXExt.position;
+                stepsExt = int(round(ext_pos/dext)) - MXExt.position;
+                Motor_control_new.Single_Motor_Step(MExt,stepsExt,50);
                 #still need to move Extruder using stepExt(signed int)
             else:
                 [x_pos,y_pos,ext_pos]=XYExtposition(lines);
