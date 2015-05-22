@@ -16,10 +16,10 @@ filename='Xiang.nc'; #file name of the G code commands
 
 GPIO.setmode(GPIO.BCM)
 
-MX=Bipolar_Stepper_Motor(4,17,27);     #pin number for a1,a2,b1,b2.  a1 and a2 form coil A; b1 and b2 form coil B
-MY=Bipolar_Stepper_Motor(23,24,7);       
-MZ=Bipolar_Stepper_Motor(18,25,22);
-MExt=Bipolar_Stepper_Motor(14,25);
+MX=Bipolar_Stepper_Motor(17,4);     #pin number for a1,a2,b1,b2.  a1 and a2 form coil A; b1 and b2 form coil B
+MY=Bipolar_Stepper_Motor(23,18);       
+MZ=Bipolar_Stepper_Motor(24,25);
+MExt=Bipolar_Stepper_Motor(27,22);
 
 dx=0.2; #resolution in x direction. Unit: mm  http://prusaprinters.org/calculator/
 dy=0.2; #resolution in y direction. Unit: mm  http://prusaprinters.org/calculator/
@@ -98,6 +98,15 @@ def XYExtposition(lines):
 
     return x_pos,y_pos,ext_pos;
 
+def ExtPosition(lines):
+    extchar_loc=lines.index('E');
+    i=extchar_loc+1;
+    while (47<ord(lines[i])<58)|(lines[i]=='.')|(lines[i]=='-'):
+        i+=1;
+    ext_pos=float(lines[extchar_loc+1:i]);
+
+    return ext_pos;
+
 def IJposition(lines):
     #given a G02 or G03 movement command line, return the I J position
     ichar_loc=lines.index('I');
@@ -156,16 +165,17 @@ def movetothree(MX,x_pos,dx,MY,y_pos,dy,MExt,ext_pos,dext,speed,engraving):
 #Move to (x_pos,y_pos) (in real unit)
     stepx=int(round(x_pos/dx))-MX.position;
     stepy=int(round(y_pos/dy))-MY.position;
+    stepExt=int(round(ext_pos/dext))-MExt.position;
 
     Total_step=sqrt((stepx**2+stepy**2));
             
     if Total_step>0:
         if lines[0:3]=='G0 ': #fast movement
             print 'No Laser, fast movement: Dx=', stepx, '  Dy=', stepy;
-            Motor_control_new.Motor_StepThree(MX,stepx,MY,stepy,50);
+            Motor_control_new.Motor_StepThree(MX,stepx,MY,stepy,MExt,stepExt,50);
         else:
             print 'Laser on, movement: Dx=', stepx, '  Dy=', stepy;
-            Motor_control_new.Motor_StepThree(MX,stepx,MY,stepy,speed);
+            Motor_control_new.Motor_StepThree(MX,stepx,MY,stepy,MExt,stepExt,speed);
     return 0;
 
 ###########################################################################################
@@ -217,6 +227,10 @@ try:#read and execute G code
             if(lines.index('E') < 0):
                 [x_pos,y_pos]=XYposition(lines);
                 moveto(MX,x_pos,dx,MY,y_pos,dy,speed,engraving);
+            elif(lines.index('X') < 0): #Extruder only
+                ext_pos = ExtPosition(lines);
+                stepsExt = int(round(ext_pos/dext))-MXExt.position;
+                #still need to move Extruder using stepExt(signed int)
             else:
                 [x_pos,y_pos,ext_pos]=XYExtposition(lines);
                 movetothree(MX,x_pos,dx,MY,y_pos,dy,MXExt,ext_pos,dext,speed,engraving);
