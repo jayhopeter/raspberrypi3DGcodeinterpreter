@@ -22,6 +22,28 @@ def sign(a): #return the sign of number a
         return -1;
     else:
         return 0;
+
+def Single_Motor_Step(stepper, step, speed):
+#   control stepper motor 1 and 2 simultaneously
+#   stepper1 and stepper2 are objects of Bipolar_Stepper_Motor class
+#   direction is reflected in the polarity of [step1] or [step2]
+
+    dir1=sign(step);  #get dirction from the polarity of argument [step]
+
+    step=abs(step);
+
+# [total_micro_step] total number of micro steps
+# stepper motor 1 will move one step every [micro_step1] steps
+# stepper motor 2 will move one step every [micro_step2] steps
+# So [total_mirco_step]=[micro_step1]*[step1] if step1<>0;  [total_micro_step]=[micro_step2]*[step2] if step2<>0 
+
+    
+
+    T=step/speed;      #total time
+                    #time delay every micro_step
+    stepper.move(dir1,step,T/4);
+    
+    return 0;
     
 def Motor_Step(stepper1, step1, stepper2, step2, speed):
 #   control stepper motor 1 and 2 simultaneously
@@ -130,3 +152,4 @@ def Motor_StepThree(stepper1, step1, stepper2, step2,stepper3,step3, speed):
         time.sleep(dt-time_laps);
 
     return 0;
+
