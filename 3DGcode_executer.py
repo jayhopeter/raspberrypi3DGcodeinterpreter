@@ -1,4 +1,3 @@
-
 import RPi.GPIO as GPIO
 import Motor_control_new
 from Bipolar_Stepper_Motor_Class_new import Bipolar_Stepper_Motor
@@ -41,7 +40,7 @@ Engraving_speed=40; #unit=mm/sec=0.04in/sec
 
 #GPIO.output(Laser_switch,False);
 #replace references to the Laser with PenOff/PenOn calls
-PenOff(MZ)
+#PenOff(MZ)
 
 speed=Engraving_speed/min(dx,dy);      #step/sec
 
@@ -99,8 +98,8 @@ def XYExtposition(lines):
 
     return x_pos,y_pos,ext_pos;
 
-def ExtPosition(lines):
-    extchar_loc=lines.index('E');
+def SinglePosition(lines,axis):
+    extchar_loc=lines.index(axis);
     i=extchar_loc+1;
     while (47<ord(lines[i])<58)|(lines[i]=='.')|(lines[i]=='-'):
         i+=1;
@@ -186,7 +185,8 @@ def movetothree(MX,x_pos,dx,MY,y_pos,dy,MExt,ext_pos,dext,speed,engraving):
 #################                           ###############################################
 ###########################################################################################
 ###########################################################################################
-
+#to do  G28, M107, M104, M109
+#
 try:#read and execute G code
     for lines in open(filename,'r'):
         if lines==[]:
@@ -225,14 +225,18 @@ try:#read and execute G code
             else:
                 engraving=True;
 
-            if(lines.index('E') < 0):
+            if(lines.index('E') < 0 & lines.index('Z') < 0):
                 [x_pos,y_pos]=XYposition(lines);
                 moveto(MX,x_pos,dx,MY,y_pos,dy,speed,engraving);
-            elif(lines.index('X') < 0): #Extruder only
-                ext_pos = ExtPosition(lines);
-                stepsExt = int(round(ext_pos/dext)) - MXExt.position;
+            elif(lines.index('X') < 0 & lines.index('Z') < 0): #Extruder only
+                ext_pos = SinglePosition(lines,'E');
+                stepsExt = int(round(ext_pos/dext)) - MExt.position;
                 Motor_control_new.Single_Motor_Step(MExt,stepsExt,50);
                 #still need to move Extruder using stepExt(signed int)
+            elif(lines.index('X') < 0 & lines.index('E') < 0): #Z Axis only
+                z_pos = SinglePosition(lines,'Z');
+                stepsZ = int(round(z_pos/dz)) - MZ.position;
+                Motor_control_new.Single_Motor_Step(MZ,stepsZ,50);
             else:
                 [x_pos,y_pos,ext_pos]=XYExtposition(lines);
                 movetothree(MX,x_pos,dx,MY,y_pos,dy,MXExt,ext_pos,dext,speed,engraving);
