@@ -39,9 +39,9 @@ def Single_Motor_Step(stepper, step, speed):
 
     
 
-    T=step/speed;      #total time
+    #T=step/speed;      #total time
                     #time delay every micro_step
-    stepper.move(dir1,step,T/4);
+    stepper.move(dir1,step);
     
     return 0;
     
@@ -119,7 +119,7 @@ def Motor_StepThree(stepper1, step1, stepper2, step2,stepper3,step3, speed):
 ##    	micro_step2=1;
 ##        micro_step1=step2+100;  #set [micro_step1]>[total_micro_step], so stepper motor will not turn
     elif step2==0:
-        total_micro_step=LCM(step,step3);
+        total_micro_step=LCM(step1,step3);
         micro_step1=total_micro_step/step1;
         micro_step3=total_micro_step/step3;
     	micro_step2=step1+100;
@@ -152,4 +152,3 @@ def Motor_StepThree(stepper1, step1, stepper2, step2,stepper3,step3, speed):
         time.sleep(dt-time_laps);
 
     return 0;
-
