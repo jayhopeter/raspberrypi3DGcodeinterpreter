@@ -12,7 +12,7 @@ from numpy import pi, sin, cos, sqrt, arccos, arcsin
 ################################################################################################
 ################################################################################################
 
-filename='Xiang.nc'; #file name of the G code commands
+filename='jhead_bracket.gcode'; #file name of the G code commands
 
 GPIO.setmode(GPIO.BCM)
 
@@ -23,7 +23,7 @@ MExt=Bipolar_Stepper_Motor(27,22);
 
 dx=0.2; #resolution in x direction. Unit: mm  http://prusaprinters.org/calculator/
 dy=0.2; #resolution in y direction. Unit: mm  http://prusaprinters.org/calculator/
-dz=0.001l #resolution in Z direction. Unit: mm  http://prusaprinters.org/calculator/
+dz=0.0011 #resolution in Z direction. Unit: mm  http://prusaprinters.org/calculator/
 dext=0.038 # resolution for Extruder Unit: mm http://forums.reprap.org/read.php?1,144245
 
 Engraving_speed=40; #unit=mm/sec=0.04in/sec
@@ -158,7 +158,7 @@ def moveto(MX,x_pos,dx,MY,y_pos,dy,speed,engraving):
             Motor_control_new.Motor_Step(MX,stepx,MY,stepy,50);
         else:
             print 'Laser on, movement: Dx=', stepx, '  Dy=', stepy;
-            Motor_control_new.Motor_Step(MX,stepx,MY,stepy,speed);
+            Motor_control_new.Motor_Step(MX,stepx,MY,stepy,speed);# hard 50 for now
     return 0;
 
 def movetothree(MX,x_pos,dx,MY,y_pos,dy,MExt,ext_pos,dext,speed,engraving):
@@ -185,10 +185,13 @@ def movetothree(MX,x_pos,dx,MY,y_pos,dy,MExt,ext_pos,dext,speed,engraving):
 #################                           ###############################################
 ###########################################################################################
 ###########################################################################################
-#to do  G28, M107, M104, M109
-#
+#to do  G28, M107, M104, M109, M106
+#Bug - motion is slow on XY moves when steps are ~50 or more on each, speed issue?
 try:#read and execute G code
+    lineCtr = 1;
     for lines in open(filename,'r'):
+        print 'processing line# '+str(lineCtr)+ ': '+lines;
+        lineCtr += 1;
         if lines==[]:
             1; #blank lines
         elif lines[0:3]=='G90':
@@ -225,21 +228,22 @@ try:#read and execute G code
             else:
                 engraving=True;
 
-            if(lines.index('E') < 0 & lines.index('Z') < 0):
+            if(lines.find('E') < 0 and lines.find('Z') < 0):
                 [x_pos,y_pos]=XYposition(lines);
                 moveto(MX,x_pos,dx,MY,y_pos,dy,speed,engraving);
-            elif(lines.index('X') < 0 & lines.index('Z') < 0): #Extruder only
+            elif(lines.find('X') < 0 and lines.find('Z') < 0): #Extruder only
                 ext_pos = SinglePosition(lines,'E');
                 stepsExt = int(round(ext_pos/dext)) - MExt.position;
                 Motor_control_new.Single_Motor_Step(MExt,stepsExt,50);
                 #still need to move Extruder using stepExt(signed int)
-            elif(lines.index('X') < 0 & lines.index('E') < 0): #Z Axis only
+            elif(lines.find('X') < 0 and lines.find('E') < 0): #Z Axis only
+                print 'Moving Z axis only';
                 z_pos = SinglePosition(lines,'Z');
                 stepsZ = int(round(z_pos/dz)) - MZ.position;
                 Motor_control_new.Single_Motor_Step(MZ,stepsZ,50);
-            else:
+            else:                
                 [x_pos,y_pos,ext_pos]=XYExtposition(lines);
-                movetothree(MX,x_pos,dx,MY,y_pos,dy,MXExt,ext_pos,dext,speed,engraving);
+                movetothree(MX,x_pos,dx,MY,y_pos,dy,MExt,ext_pos,dext,speed,engraving);
                 #create new moveto function to include Extruder postition
             
         elif (lines[0:3]=='G02')|(lines[0:3]=='G03'): #circular interpolation
