@@ -23,8 +23,8 @@ MExt=Bipolar_Stepper_Motor(27,22);
 
 dx=0.2; #resolution in x direction. Unit: mm  http://prusaprinters.org/calculator/
 dy=0.2; #resolution in y direction. Unit: mm  http://prusaprinters.org/calculator/
-dz=0.004 #resolution in Z direction. Unit: mm  http://prusaprinters.org/calculator/
-dext=0.038 # resolution for Extruder Unit: mm http://forums.reprap.org/read.php?1,144245
+dz=0.004; #resolution in Z direction. Unit: mm  http://prusaprinters.org/calculator/
+dext=0.038; # resolution for Extruder Unit: mm http://forums.reprap.org/read.php?1,144245
 
 Engraving_speed=40; #unit=mm/sec=0.04in/sec
 
@@ -196,6 +196,9 @@ try:#read and execute G code
             1; #blank lines
         elif lines[0:3]=='G90':
             print 'start';
+        elif lines[0:3]=='G92':
+            print 'Reset Extruder to 0';
+            MExt.position = 0;
             
         elif lines[0:3]=='G20':# working in inch;
             dx/=25.4;
