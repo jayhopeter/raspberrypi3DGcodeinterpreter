@@ -60,6 +60,24 @@ speed=Engraving_speed/min(dx,dy);      #step/sec
 ################################################################################################
 ################################################################################################
 
+def writeToLog(outputText):
+    with open('tempout.txt','a') as f:
+        f.write(outputText)
+    print outputText
+
+def sampleHeaters(extThermPin,heatbeadThermPin):
+    sampleHeaterDutyCycle(extThermPin, "Extruder")
+    sampleHeaterDutyCycle(heatbeadThermPin, "Heated Bed")
+
+def sampleHeaterDutyCycle(pin, name):
+    writeToLog("Testing "+ name +" Temperature\n");
+    counter = 0
+    GPIO.wait_for_edge(pin, GPIO.RISING)
+    while GPIO.input(pin) == GPIO.HIGH:
+        counter += 1
+        time.sleep(0.001)
+    writeToLog(name+ " Thermistor 555 Timer High Pulse Time "+ str(counter)+"\n")
+
 def PenOff(ZMotor):
     # move ZAxis ~5 steps up
     ZMotor.move(1,5)
