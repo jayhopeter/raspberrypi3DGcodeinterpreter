@@ -20,6 +20,14 @@ MX=Bipolar_Stepper_Motor(17,4);     #pin number for a1,a2,b1,b2.  a1 and a2 form
 MY=Bipolar_Stepper_Motor(23,18);       
 MZ=Bipolar_Stepper_Motor(24,25);
 MExt=Bipolar_Stepper_Motor(27,22);
+#EndStop/Home Access code needed still
+#EndStopX = 14
+#EndStopY = 15
+#EndStopZ = 7
+ExtHeater = 10
+HeatBed = 9
+ExtThermistor = 11
+HeatBedThermistor = 8
 
 dx=0.2; #resolution in x direction. Unit: mm  http://prusaprinters.org/calculator/
 dy=0.2; #resolution in y direction. Unit: mm  http://prusaprinters.org/calculator/
