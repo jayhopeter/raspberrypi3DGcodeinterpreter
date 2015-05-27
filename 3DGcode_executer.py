@@ -28,6 +28,8 @@ ExtHeater = 10
 HeatBed = 9
 ExtThermistor = 11
 HeatBedThermistor = 8
+outputs = [ExtHeater,HeatBed];
+inputs = [ExtThermistor,HeatBedThermistor];
 
 dx=0.2; #resolution in x direction. Unit: mm  http://prusaprinters.org/calculator/
 dy=0.2; #resolution in y direction. Unit: mm  http://prusaprinters.org/calculator/
@@ -44,11 +46,10 @@ Engraving_speed=40; #unit=mm/sec=0.04in/sec
 ################################################################################################
 ################################################################################################
     
-#GPIO.setup(Laser_switch,GPIO.OUT);
+GPIO.setup(outputs,GPIO.OUT);
+GPIO.output(outputs, False);
 
-#GPIO.output(Laser_switch,False);
-#replace references to the Laser with PenOff/PenOn calls
-#PenOff(MZ)
+GPIO.setup(inputs,GPIO.IN);
 
 speed=Engraving_speed/min(dx,dy);      #step/sec
 
@@ -334,3 +335,4 @@ MY.unhold();
 MZ.unhold();
 
 GPIO.cleanup();
+
