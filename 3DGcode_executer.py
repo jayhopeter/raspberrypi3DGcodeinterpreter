@@ -65,6 +65,7 @@ def writeToLog(outputText):
         f.write(outputText)
     print outputText
 
+#these functions are for debugging purposes only
 def sampleHeaters(extThermPin,heatbeadThermPin):
     sampleHeaterDutyCycle(extThermPin, "Extruder")
     sampleHeaterDutyCycle(heatbeadThermPin, "Heated Bed")
@@ -77,6 +78,9 @@ def sampleHeaterDutyCycle(pin, name):
         counter += 1
         time.sleep(0.001)
     writeToLog(name+ " Thermistor 555 Timer High Pulse Time "+ str(counter)+"\n")
+
+#to do: write a function to get the rise time from a pin(thermistor pin) from the 555 timer out and cross reference with 
+#tempurature table to return the estimated current temperature of the cooresponding heater.
 
 def PenOff(ZMotor):
     # move ZAxis ~5 steps up
