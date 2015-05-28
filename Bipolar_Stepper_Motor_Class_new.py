@@ -10,6 +10,13 @@ phase_seq=[[1,0],[0,0],[0,1],[1,1]];
 #half-step sequence. double resolution. But the torque of the stepper motor is not constant 
 num_phase=len(phase_seq);
 
+
+
+#to do:  Create seperate class for 2 pin stepper control and 4 pin stepper control
+#see http://www.arduino.cc/en/Reference/StepperBipolarCircuit  I use not gate/hex inverter for the 2 pin setup
+#We maybe able to do it all with this class using default values in the constructor
+#We can also pass another variable to specify full or half steping
+#The phase sequence will then be set in the constructor itself 
 class Bipolar_Stepper_Motor:
     
     phase=0;
@@ -19,6 +26,7 @@ class Bipolar_Stepper_Motor:
     a=0;#pin numbers
     b=0;
     enable=0;
+
     def __init__(self,a,b,enable=0):
     #initial a Bipolar_Stepper_Moter objects by assigning the pins
     
