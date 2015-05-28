@@ -253,6 +253,12 @@ try:#read and execute G code
             GPIO.output(Laser_switch,False);
             print 'finished. shuting down';
             break;
+        elif lines[0:4]=='M104':
+            #need to set temperature here as well
+            #for now we will just turn on extruderheater
+            print 'Extruder Heater On';
+            GPIO.output(ExtHeater,True);
+            
         elif (lines[0:3]=='G1F')|(lines[0:4]=='G1 F'):
             1;#do nothing
         elif (lines[0:3]=='G0 ')|(lines[0:3]=='G1 ')|(lines[0:3]=='G01'):#|(lines[0:3]=='G02')|(lines[0:3]=='G03'):
@@ -335,4 +341,3 @@ MY.unhold();
 MZ.unhold();
 
 GPIO.cleanup();
-
