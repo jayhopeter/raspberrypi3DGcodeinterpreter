@@ -253,9 +253,17 @@ try:#read and execute G code
             GPIO.output(Laser_switch,False);
             print 'finished. shuting down';
             break;
-        elif lines[0:4]=='M104':
+        elif lines[0:4]=='M104': #Set Extruder Temperature 
             #need to set temperature here as well
             #for now we will just turn on extruderheater
+            print 'Extruder Heater On';
+            GPIO.output(ExtHeater,True);
+        elif lines[0:4]=='M109':  #Set Extruder Temperature and Wait
+            #need to set temperature here and wait for correct temp as well
+            #for now we will just turn on extruderheater
+            #I would like to this all with the raspberry pi but...
+            #I may use a simple Arduino(Uno) sketch to handle tempurature regulation 
+            #Doing with the RaspPi only would require polling the tempurature(maybe at each Z axis move?)
             print 'Extruder Heater On';
             GPIO.output(ExtHeater,True);
             
