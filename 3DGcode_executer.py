@@ -259,6 +259,9 @@ try:#read and execute G code
             print 'Extruder Heater On';
             GPIO.output(ExtHeater,True);
             sampleHeaters(ExtThermistor,HeatBedThermistor);
+        elif lines[0:4]=='M106': #Fan on 
+            #for now we will just print the follow text
+            print 'Fan On';
         elif lines[0:4]=='M109':  #Set Extruder Temperature and Wait
             #need to set temperature here and wait for correct temp as well
             #for now we will just turn on extruderheater
