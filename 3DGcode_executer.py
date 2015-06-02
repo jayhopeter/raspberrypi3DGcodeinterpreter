@@ -107,6 +107,13 @@ def XYposition(lines):
 
     return x_pos,y_pos;
 
+def homeAxis():
+    #need to home the axis
+    #step each access until endstop is triggered
+    #then change endstop GPIOs to output to re-enable the motors and fire of 1-5 steps
+    #in the opposite direction.  Then step endstop GPIO back to input.
+    
+
 def XYExtposition(lines):
     #given a movement command line, return the X Y position
     xchar_loc=lines.index('X');
