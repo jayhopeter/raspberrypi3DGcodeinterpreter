@@ -244,7 +244,11 @@ try:#read and execute G code
             print 'Working in inch';
               
         elif lines[0:3]=='G21':# working in mm;
-            print 'Working in mm';  
+            print 'Working in mm';
+            
+        elif lines[0:3]=='G28': # homing all axis
+            print 'Homing all axis';
+            #move till endstops trigger
             
         elif lines[0:3]=='M05':
             PenOff(MZ)
