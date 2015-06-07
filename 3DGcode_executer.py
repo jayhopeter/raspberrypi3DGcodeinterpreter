@@ -73,13 +73,24 @@ def sampleHeaters(extThermPin,heatbeadThermPin):
 
 def sampleHeaterDutyCycle(pin, name):
     writeToLog("Testing "+ name +" Temperature\n");
-    counter = 0
-    GPIO.wait_for_edge(pin, GPIO.RISING)
-    while GPIO.input(pin) == GPIO.HIGH:
-        counter += 1
-        time.sleep(0.001)
+    counter = get555PulseHightTime(pin);
     writeToLog(name+ " Thermistor 555 Timer High Pulse Time "+ str(counter)+"\n")
-
+    
+def get555PulseHighTime(pin):
+	counter = 0;
+	GPIO.wait_for_edge(pin, GPIO.RISING);
+    	while GPIO.input(pin) == GPIO.HIGH:
+    		counter += 1;
+    		time.sleep(0.001);
+    	return counter;
+    	
+def getTempFromTable(pin):
+	pulseHighTime = get555PulseHighTime(pin);
+	estTemp = 0;
+	#read from tempurate text file and return estimated temp from pulse time
+	
+	return estTemp;
+	
 #to do: write a function to get the rise time from a pin(thermistor pin) from the 555 timer out and cross reference with 
 #tempurature table to return the estimated current temperature of the cooresponding heater.
 
