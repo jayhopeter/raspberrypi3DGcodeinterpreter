@@ -88,7 +88,13 @@ def getTempFromTable(pin):
 	pulseHighTime = get555PulseHighTime(pin);
 	estTemp = 0;
 	#read from tempurate text file and return estimated temp from pulse time
-	
+	linectr = 0;
+	for lines in open('Thermistor555TimerTempChart.txt','r'):
+            if linectr > 5:
+                lineSplit = lines.split();
+                if lineSplit[2] >= pulseHighTime:
+                    estTemp = lineSplit[1];
+            linectr += 1;
 	return estTemp;
 	
 #to do: write a function to get the rise time from a pin(thermistor pin) from the 555 timer out and cross reference with 
