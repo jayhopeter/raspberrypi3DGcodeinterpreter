@@ -73,8 +73,10 @@ def sampleHeaters(extThermPin,heatbeadThermPin):
 
 def sampleHeaterDutyCycle(pin, name):
     writeToLog("Testing "+ name +" Temperature\n");
-    counter = get555PulseHightTime(pin);
-    writeToLog(name+ " Thermistor 555 Timer High Pulse Time "+ str(counter)+"\n")
+    highTime = get555PulseHightTime(pin);
+    writeToLog(name+ " Thermistor 555 Timer High Pulse Time "+ str(highTime)+"\n")
+    estTemp = getTempFromTable(pin)
+    writeToLog(name+ " Estimated Tempurature "+ str(estTemp)+"\n")
     
 def get555PulseHighTime(pin):
 	counter = 0;
@@ -83,7 +85,9 @@ def get555PulseHighTime(pin):
     		counter += 1;
     		time.sleep(0.001);
     	return counter;
-    	
+    		
+#this function gets the rise time from a pin(thermistor pin) from the 555 timer out and cross reference with 
+#tempurature table to return the estimated current temperature of the cooresponding heater.
 def getTempFromTable(pin):
 	pulseHighTime = get555PulseHighTime(pin);
 	estTemp = 0;
@@ -94,11 +98,10 @@ def getTempFromTable(pin):
                 lineSplit = lines.split();
                 if lineSplit[2] >= pulseHighTime:
                     estTemp = lineSplit[1];
+                    break
             linectr += 1;
 	return estTemp;
-	
-#to do: write a function to get the rise time from a pin(thermistor pin) from the 555 timer out and cross reference with 
-#tempurature table to return the estimated current temperature of the cooresponding heater.
+
 
 def PenOff(ZMotor):
     # move ZAxis ~5 steps up
