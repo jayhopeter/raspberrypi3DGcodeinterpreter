@@ -305,7 +305,13 @@ try:#read and execute G code
             #Doing with the RaspPi only would require polling the tempurature(maybe at each Z axis move?)
             print 'Extruder Heater On';
             GPIO.output(ExtHeater,True);
+            extTemp = SinglePosition(lines,'S');
+            print 'Extruder Heater On and setting temperature to '+ extTemp +'C';
             sampleHeaters(ExtThermistor,HeatBedThermistor);
+            temp = getTempFromTable(ExtHeater)
+            while temp < extTemp:
+            	time.sleep(0.02);
+            	temp = getTempFromTable(ExtHeater)
 
         elif lines[0:4]=='M190':  #Set HeatBed Temperature and Wait
             #need to set temperature here and wait for correct temp as well
