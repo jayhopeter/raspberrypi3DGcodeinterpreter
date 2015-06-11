@@ -8,10 +8,14 @@ int maxTemp = 450;
 void setup() {
   // declare the ledPin as an OUTPUT:
   pinMode(ledPin, OUTPUT);  
-  //Serial.begin(9600); 
+  Serial.begin(9600); 
 }
 
 void loop() {
+  if (Serial.available() > 0) {
+   // read the incoming tempsetting
+   maxTemp = Serial.read();
+  }
   // read the value from the sensor:
   sensorValue = analogRead(sensorPin);    
   // turn the ledPin on
