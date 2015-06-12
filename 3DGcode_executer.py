@@ -21,15 +21,15 @@ MY=Bipolar_Stepper_Motor(23,18);
 MZ=Bipolar_Stepper_Motor(24,25);
 MExt=Bipolar_Stepper_Motor(27,22);
 #EndStop/Home Axis code needed still
-#EndStopX = 14
-#EndStopY = 15
-#EndStopZ = 7
+EndStopX = 14
+EndStopY = 15
+EndStopZ = 7
 ExtHeater = 10
 HeatBed = 9
 ExtThermistor = 11
 HeatBedThermistor = 8
 outputs = [ExtHeater,HeatBed];
-inputs = [ExtThermistor,HeatBedThermistor];
+inputs = [ExtThermistor,HeatBedThermistor,EndStopX,EndStopY,EndStopZ];
 
 dx=0.2; #resolution in x direction. Unit: mm  http://prusaprinters.org/calculator/
 dy=0.2; #resolution in y direction. Unit: mm  http://prusaprinters.org/calculator/
@@ -49,7 +49,7 @@ Engraving_speed=40; #unit=mm/sec=0.04in/sec
 GPIO.setup(outputs,GPIO.OUT);
 GPIO.output(outputs, False);
 
-GPIO.setup(inputs,GPIO.IN);
+GPIO.setup(inputs,GPIO.IN);  # pull_up_down=GPIO.PUD_UP  or pull_up_down=GPIO.PUD_DOWN
 
 speed=Engraving_speed/min(dx,dy);      #step/sec
 
@@ -127,11 +127,20 @@ def XYposition(lines):
 
     return x_pos,y_pos;
 
-def homeAxis():
+def homeAxis(motor,endStopPin):
     #need to home the axis
-    #step each access until endstop is triggered
+    #step axis until endstop is triggered
+    while GPIO.input(endStopPin) == GPIO.HIGH:
+    	motor.move(-1,1);
     #then change endstop GPIOs to output to re-enable the motors and fire of 1-5 steps
-    #in the opposite direction.  Then step endstop GPIO back to input.
+    #in the opposite direction.  Note* this is first time I've changed the function of GPIO(input to output)
+    #in the middle of a program.  I'm not sure if this is even possible but I'm assuming it is.
+    GPIO.setup(endStopPin,GPIO.OUT);
+    GPIO.output(endStopPin, True);
+    motor.move(1,1);
+    #Then step endstop GPIO back to input.
+    GPIO.output(endStopPin, False);
+    GPIO.setup(endStopPin,GPIO.IN); # pull_up_down=GPIO.PUD_UP  or pull_up_down=GPIO.PUD_DOWN
     
 
 def XYExtposition(lines):
@@ -267,8 +276,14 @@ try:#read and execute G code
             print 'Working in mm';
             
         elif lines[0:3]=='G28': # homing all axis
-            print 'Homing all axis';
+            print 'Homing all axis...';
             #move till endstops trigger
+            print 'Homing X axis...';
+            homeAxis(MX,EndStopX)
+            print 'Homing Y axis...';
+            homeAxis(MY,EndStopY)
+            print 'Homing Z axis...';
+            homeAxis(MZ,EndStopZ)
             
         elif lines[0:3]=='M05':
             PenOff(MZ)
