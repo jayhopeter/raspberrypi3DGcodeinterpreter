@@ -49,7 +49,7 @@ Engraving_speed=40; #unit=mm/sec=0.04in/sec
 GPIO.setup(outputs,GPIO.OUT);
 GPIO.output(outputs, False);
 
-GPIO.setup(inputs,GPIO.IN);  # pull_up_down=GPIO.PUD_UP  or pull_up_down=GPIO.PUD_DOWN
+GPIO.setup(inputs,GPIO.IN,pull_up_down=GPIO.PUD_DOWN);  # pull_up_down=GPIO.PUD_UP  or pull_up_down=GPIO.PUD_DOWN
 
 speed=Engraving_speed/min(dx,dy);      #step/sec
 
@@ -140,7 +140,7 @@ def homeAxis(motor,endStopPin):
     motor.move(1,1);
     #Then step endstop GPIO back to input.
     GPIO.output(endStopPin, False);
-    GPIO.setup(endStopPin,GPIO.IN); # pull_up_down=GPIO.PUD_UP  or pull_up_down=GPIO.PUD_DOWN
+    GPIO.setup(endStopPin,GPIO.IN,pull_up_down=GPIO.PUD_DOWN); # pull_up_down=GPIO.PUD_UP  or pull_up_down=GPIO.PUD_DOWN
     
 
 def XYExtposition(lines):
