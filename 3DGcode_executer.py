@@ -325,8 +325,9 @@ try:#read and execute G code
             sampleHeaters(ExtThermistor,HeatBedThermistor);
             temp = getTempFromTable(ExtHeater)
             while temp < extTemp:
-            	time.sleep(0.02);
+            	time.sleep(0.2);
             	temp = getTempFromTable(ExtHeater)
+            	print temp;
 
         elif lines[0:4]=='M190':  #Set HeatBed Temperature and Wait
             #need to set temperature here and wait for correct temp as well
