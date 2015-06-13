@@ -74,7 +74,7 @@ def sampleHeaters(extThermPin,heatbeadThermPin):
 
 def sampleHeaterDutyCycle(pin, name):
     writeToLog("Testing "+ name +" Temperature\n");
-    highTime = get555PulseHightTime(pin);
+    highTime = get555PulseHighTime(pin);
     writeToLog(name+ " Thermistor 555 Timer High Pulse Time "+ str(highTime)+"\n")
     estTemp = getTempFromTable(pin)
     writeToLog(name+ " Estimated Tempurature "+ str(estTemp)+"\n")
