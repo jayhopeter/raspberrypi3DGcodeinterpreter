@@ -324,10 +324,10 @@ try:#read and execute G code
             extTemp = SinglePosition(lines,'S');
             print 'Extruder Heater On and setting temperature to '+ str(extTemp) +'C';
             sampleHeaters(ExtThermistor,HeatBedThermistor);
-            temp = getTempFromTable(ExtHeater)
+            temp = getTempFromTable(ExtThermistor)
             while temp < extTemp:
             	time.sleep(0.2);
-            	temp = getTempFromTable(ExtHeater)
+            	temp = getTempFromTable(ExtThermistor)
             	print str(temp);
 
         elif lines[0:4]=='M190':  #Set HeatBed Temperature and Wait
