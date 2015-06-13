@@ -12,7 +12,7 @@ from numpy import pi, sin, cos, sqrt, arccos, arcsin
 ################################################################################################
 ################################################################################################
 
-filename='jhead_bracket.gcode'; #file name of the G code commands
+filename='fixedSmallGear.gcode'; #file name of the G code commands
 
 GPIO.setmode(GPIO.BCM)
 
@@ -28,8 +28,8 @@ ExtHeater = 10
 HeatBed = 9
 ExtThermistor = 11
 HeatBedThermistor = 8
-outputs = [ExtHeater,HeatBed];
-inputs = [ExtThermistor,HeatBedThermistor,EndStopX,EndStopY,EndStopZ];
+outputs = (ExtHeater,HeatBed);
+inputs = (ExtThermistor,HeatBedThermistor,EndStopX,EndStopY,EndStopZ);
 
 dx=0.2; #resolution in x direction. Unit: mm  http://prusaprinters.org/calculator/
 dy=0.2; #resolution in y direction. Unit: mm  http://prusaprinters.org/calculator/
