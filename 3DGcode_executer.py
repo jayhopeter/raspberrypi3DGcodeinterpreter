@@ -15,7 +15,7 @@ from numpy import pi, sin, cos, sqrt, arccos, arcsin
 filename='fixedSmallGear.gcode'; #file name of the G code commands
 
 GPIO.setmode(GPIO.BCM)
-
+print GPIO.VERSION
 MX=Bipolar_Stepper_Motor(17,4);     #pin number for a1,a2,b1,b2.  a1 and a2 form coil A; b1 and b2 form coil B
 MY=Bipolar_Stepper_Motor(23,18);       
 MZ=Bipolar_Stepper_Motor(24,25);
@@ -28,8 +28,9 @@ ExtHeater = 10
 HeatBed = 9
 ExtThermistor = 11
 HeatBedThermistor = 8
-outputs = (ExtHeater,HeatBed);
-inputs = (ExtThermistor,HeatBedThermistor,EndStopX,EndStopY,EndStopZ);
+#note only can set lists with 0.5.8 and above version of RPi.GPIO orginal PI caps out at 0.5.5?
+outputs = [ExtHeater,HeatBed];
+inputs = [ExtThermistor,HeatBedThermistor,EndStopX,EndStopY,EndStopZ];
 
 dx=0.2; #resolution in x direction. Unit: mm  http://prusaprinters.org/calculator/
 dy=0.2; #resolution in y direction. Unit: mm  http://prusaprinters.org/calculator/
@@ -303,7 +304,7 @@ try:#read and execute G code
             #need to set temperature here as well
             #for now we will just turn on extruderheater
             extTemp = SinglePosition(lines,'S');
-            print 'Extruder Heater On and setting temperature to '+ extTemp +'C';
+            print 'Extruder Heater On and setting temperature to '+ str(extTemp) +'C';
             GPIO.output(ExtHeater,True);
             sampleHeaters(ExtThermistor,HeatBedThermistor);
         elif lines[0:4]=='M106': #Fan on 
@@ -321,13 +322,13 @@ try:#read and execute G code
             print 'Extruder Heater On';
             GPIO.output(ExtHeater,True);
             extTemp = SinglePosition(lines,'S');
-            print 'Extruder Heater On and setting temperature to '+ extTemp +'C';
+            print 'Extruder Heater On and setting temperature to '+ str(extTemp) +'C';
             sampleHeaters(ExtThermistor,HeatBedThermistor);
             temp = getTempFromTable(ExtHeater)
             while temp < extTemp:
             	time.sleep(0.2);
             	temp = getTempFromTable(ExtHeater)
-            	print temp;
+            	print str(temp);
 
         elif lines[0:4]=='M190':  #Set HeatBed Temperature and Wait
             #need to set temperature here and wait for correct temp as well
@@ -337,7 +338,7 @@ try:#read and execute G code
             #Doing with the RaspPi only would require polling the tempurature(maybe at each Z axis move?)
             heatBedTemp = SinglePosition(lines,'S');
             print 'HeatBed Heater On';
-            print 'Setting HeatBed temperature to '+ heatBedTemp +'C and waiting';
+            print 'Setting HeatBed temperature to '+ str(heatBedTemp) +'C and waiting';
             GPIO.output(HeatBed,True);
             sampleHeaters(ExtThermistor,HeatBedThermistor);
             
