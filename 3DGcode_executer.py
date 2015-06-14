@@ -97,7 +97,7 @@ def getTempFromTable(pin):
 	for lines in open('Thermistor555TimerTempChart.txt','r'):
             if linectr > 5:
                 lineSplit = lines.split();
-                if lineSplit[2] >= pulseHighTime:
+                if lineSplit[2] <= pulseHighTime:
                     estTemp = lineSplit[1];
                     break
             linectr += 1;
