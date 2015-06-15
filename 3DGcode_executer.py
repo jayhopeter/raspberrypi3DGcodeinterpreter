@@ -39,6 +39,9 @@ dext=0.038; # resolution for Extruder Unit: mm http://forums.reprap.org/read.php
 
 Engraving_speed=40; #unit=mm/sec=0.04in/sec
 
+extTemp = 0; #global variable for current tempurature settings
+heatBedTemp = 0;
+
 #######B#########################################################################################
 ################################################################################################
 #################                            ###################################################
@@ -105,6 +108,16 @@ def getTempFromTable(pin):
             estTemp = 250; #more than max temp
 	return estTemp;
 
+#polling tempurature and setting to +/- 40degC of supplied tempfrom GCode
+def checkTemps():
+	if (getTempFromTable(extThermistor) - 20) >= extTemp:
+		GPIO.output(extHeater, False);
+	elif(getTempFromTable(extThermistor) + 20) <= extTemp:
+		GPIO.output(extHeater, True);
+	if (getTempFromTable(HeatBedThermistor) - 20) >= heatBedTemp:
+		GPIO.output(HeatBed, False);
+	elif(getTempFromTable(HeatBedThermistor) + 20) <= heatBedTemp:
+		GPIO.output(HeatBed, True);
 
 def PenOff(ZMotor):
     # move ZAxis ~5 steps up
