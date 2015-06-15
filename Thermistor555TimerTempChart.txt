@@ -22,4 +22,4 @@ Thermistor Resistance (ohms)	Temp( C )	555 Output Time Pulse High(mS)
 147.9	160	36.310
 96.8	180	36.143
 65.59	200	36.042
-
+45.81 220 35.977
