@@ -391,6 +391,8 @@ try:#read and execute G code
                 z_pos = SinglePosition(lines,'Z');
                 stepsZ = int(round(z_pos/dz)) - MZ.position;
                 Motor_control_new.Single_Motor_Step(MZ,stepsZ,50);
+                #check Extruder and Heat Bed temp after Z axiz move
+                checkTemps();
             else:                
                 [x_pos,y_pos,ext_pos]=XYExtposition(lines);
                 movetothree(MX,x_pos,dx,MY,y_pos,dy,MExt,ext_pos,dext,speed,engraving);
@@ -443,7 +445,9 @@ try:#read and execute G code
 except KeyboardInterrupt:
     pass
 
-PenOff(MZ);   # turn off laser
+#shut off heaters
+GPIO.output(outputs, False);
+#PenOff(MZ);   # turn off laser
 moveto(MX,0,dx,MY,0,dy,50,False);  # move back to Origin
 
 MX.unhold();
