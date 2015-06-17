@@ -108,15 +108,15 @@ def getTempFromTable(pin):
             estTemp = 250; #more than max temp
 	return estTemp;
 
-#polling tempurature and setting to +/- 40degC of supplied tempfrom GCode
+#polling tempurature and setting to +/- 20degC of supplied tempfrom GCode
 def checkTemps():
-	if (getTempFromTable(extThermistor) - 20) >= extTemp:
+	if (getTempFromTable(extThermistor) - 10) >= extTemp:
 		GPIO.output(extHeater, False);
-	elif(getTempFromTable(extThermistor) + 20) <= extTemp:
+	elif(getTempFromTable(extThermistor) + 10) <= extTemp:
 		GPIO.output(extHeater, True);
-	if (getTempFromTable(HeatBedThermistor) - 20) >= heatBedTemp:
+	if (getTempFromTable(HeatBedThermistor) - 10) >= heatBedTemp:
 		GPIO.output(HeatBed, False);
-	elif(getTempFromTable(HeatBedThermistor) + 20) <= heatBedTemp:
+	elif(getTempFromTable(HeatBedThermistor) + 10) <= heatBedTemp:
 		GPIO.output(HeatBed, True);
 
 def PenOff(ZMotor):
@@ -316,8 +316,8 @@ try:#read and execute G code
             print 'finished. shuting down';
             break;
         elif lines[0:4]=='M104': #Set Extruder Temperature 
-            #need to set temperature here as well
-            #for now we will just turn on extruderheater
+            #note that we should just be setting the tempurature here, but because this always fires before M109 call
+            #I'm just turning the extruder on as well because then it can start heating up
             extTemp = SinglePosition(lines,'S');
             print 'Extruder Heater On and setting temperature to '+ str(extTemp) +'C';
             GPIO.output(ExtHeater,True);
@@ -338,12 +338,19 @@ try:#read and execute G code
             GPIO.output(ExtHeater,True);
             extTemp = SinglePosition(lines,'S');
             print 'Extruder Heater On and setting temperature to '+ str(extTemp) +'C';
+            print 'Waiting to reach target temp...';
             sampleHeaters(ExtThermistor,HeatBedThermistor);
             temp = getTempFromTable(ExtThermistor)
             while temp < extTemp:
             	time.sleep(0.2);
             	temp = getTempFromTable(ExtThermistor)
             	print str(temp);
+            	
+        elif lines[0:4]=='M140': #Set Heat Bed Temperature 
+            #need to set temperature here as well
+            #for now we will just turn on extruderheater
+            heatBedTemp = SinglePosition(lines,'S');
+            print 'Setting Heat Bed temperature to '+ str(heatBedTemp) +'C';
 
         elif lines[0:4]=='M190':  #Set HeatBed Temperature and Wait
             #need to set temperature here and wait for correct temp as well
@@ -356,6 +363,11 @@ try:#read and execute G code
             print 'Setting HeatBed temperature to '+ str(heatBedTemp) +'C and waiting';
             GPIO.output(HeatBed,True);
             sampleHeaters(ExtThermistor,HeatBedThermistor);
+            temp = getTempFromTable(HeatBedThermistor)
+            while temp < heatBedTemp:
+            	time.sleep(0.2);
+            	temp = getTempFromTable(HeatBedThermistor)
+            	print str(temp);
             
         elif (lines[0:3]=='G1F')|(lines[0:4]=='G1 F'):
             1;#do nothing
