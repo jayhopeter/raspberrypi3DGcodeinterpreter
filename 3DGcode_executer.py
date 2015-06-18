@@ -401,9 +401,17 @@ try:#read and execute G code
         elif (lines[0:3]=='G02')|(lines[0:3]=='G03'): #circular interpolation
             old_x_pos=x_pos;
             old_y_pos=y_pos;
-
-            [x_pos,y_pos]=XYposition(lines);
-            [i_pos,j_pos]=IJposition(lines);
+            
+            ext_pos = 0;
+            
+            #still need to add code here to handle extrusion info from the line if it is available
+            if(lines.find('E') >= 0):
+            	#get E value as well as the rest
+            	[x_pos,y_pos]=XYposition(lines);
+            	[i_pos,j_pos,ext_pos]=IJEposition(lines);
+            else:
+            	[x_pos,y_pos]=XYposition(lines);
+            	[i_pos,j_pos]=IJposition(lines);
 
             xcenter=old_x_pos+i_pos;   #center of the circle for interpolation
             ycenter=old_y_pos+j_pos;
@@ -435,12 +443,18 @@ try:#read and execute G code
                 theta=2.0*pi-theta;
 
             no_step=int(round(r*theta/dx/5.0));   # number of point for the circular interpolation
+            extruderMovePerStep = 0;
+            if ext_pos != 0:
+            	extruderMovePerStep = (ext_pos - MExt.position)/no_step;
             
             for i in range(1,no_step+1):
-                tmp_theta=i*theta/no_step;
-                tmp_x_pos=xcenter+e1[0]*cos(tmp_theta)+e2[0]*sin(tmp_theta);
-                tmp_y_pos=ycenter+e1[1]*cos(tmp_theta)+e2[1]*sin(tmp_theta);
-                moveto(MX,tmp_x_pos,dx,MY, tmp_y_pos,dy,speed,True);
+               	tmp_theta=i*theta/no_step;
+               	tmp_x_pos=xcenter+e1[0]*cos(tmp_theta)+e2[0]*sin(tmp_theta);
+               	tmp_y_pos=ycenter+e1[1]*cos(tmp_theta)+e2[1]*sin(tmp_theta);
+               	if extruderMovePerStep == 0:
+               		moveto(MX,tmp_x_pos,dx,MY, tmp_y_pos,dy,speed,True);
+               	else:
+               		movetothree(MX,tmp_x_pos,dx,MY, tmp_y_pos,dy,MExt,MExt.position+extruderMovePerStep,dext,speed,True);
         
 except KeyboardInterrupt:
     pass
