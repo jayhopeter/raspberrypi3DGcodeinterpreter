@@ -87,7 +87,7 @@ def get555PulseHighTime(pin):
 	GPIO.wait_for_edge(pin, GPIO.RISING);
     	while GPIO.input(pin) == GPIO.HIGH:
     		counter += 1;
-    		time.sleep(0.001);
+    		time.sleep(0.001); # may try to change this to 0.0001 for more resolution
     	return counter;
     		
 #this function gets the rise time from a pin(thermistor pin) from the 555 timer out and cross reference with 
