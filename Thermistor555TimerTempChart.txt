@@ -1,6 +1,6 @@
 This is temperature chart for a Honeywell 135-103LAF-J01 10K thermistor.  
 Because the Raspberry PI has no analog read I'm using a 555 timer in astable mode and measuring the output 
-pulse high time(poor mans AD converter).
+pulse high time(poor mans AD converter). In practice we want a much smaller Cap for quicker read times
 
 C: 4.7 uF  R1: Thermistor + 1K Ohm(555 resistors should stay above 1K)  R2: 10K Ohms		
 Thermistor Resistance (ohms)	Temp( C )	555 Output Time Pulse High(mS)
