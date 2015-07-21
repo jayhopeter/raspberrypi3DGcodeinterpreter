@@ -104,7 +104,7 @@ def getTempFromTable(pin):
                     estTemp = lineSplit[1];
                     break
             linectr += 1;
-        if estTemp == 0:
+        if estTemp = 0:
             estTemp = 250; #more than max temp
 	return estTemp;
 
