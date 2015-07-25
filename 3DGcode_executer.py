@@ -88,7 +88,7 @@ def get555PulseHighTime(pin):
     	while GPIO.input(pin) == GPIO.HIGH:
     		counter += 1;
     		time.sleep(0.001); # may try to change this to 0.0001 for more resolution
-    	return counter;
+    	return float(counter);
     		
 #this function gets the rise time from a pin(thermistor pin) from the 555 timer out and cross reference with 
 #tempurature table to return the estimated current temperature of the cooresponding heater.
@@ -100,20 +100,20 @@ def getTempFromTable(pin):
 	for lines in open('Thermistor555TimerTempChart.txt','r'):
             if linectr > 5:
                 lineSplit = lines.split();
-                if lineSplit[2] <= pulseHighTime:
+                if float(lineSplit[2]) <= pulseHighTime:
                     estTemp = lineSplit[1];
                     break
             linectr += 1;
         if estTemp == 0:
             estTemp = 250; #more than max temp
-	return estTemp;
+	return float(estTemp);
 
 #polling tempurature and setting to +/- 20degC of supplied tempfrom GCode
 def checkTemps():
-	if (getTempFromTable(extThermistor) - 10) >= extTemp:
-		GPIO.output(extHeater, False);
-	elif(getTempFromTable(extThermistor) + 10) <= extTemp:
-		GPIO.output(extHeater, True);
+	if (getTempFromTable(ExtThermistor) - 10) >= extTemp:
+		GPIO.output(ExtHeater, False);
+	elif(getTempFromTable(ExtThermistor) + 10) <= extTemp:
+		GPIO.output(ExtHeater, True);
 	if (getTempFromTable(HeatBedThermistor) - 10) >= heatBedTemp:
 		GPIO.output(HeatBed, False);
 	elif(getTempFromTable(HeatBedThermistor) + 10) <= heatBedTemp:
@@ -318,7 +318,7 @@ try:#read and execute G code
         elif lines[0:4]=='M104': #Set Extruder Temperature 
             #note that we should just be setting the tempurature here, but because this always fires before M109 call
             #I'm just turning the extruder on as well because then it can start heating up
-            extTemp = SinglePosition(lines,'S');
+            extTemp = float(SinglePosition(lines,'S'));
             print 'Extruder Heater On and setting temperature to '+ str(extTemp) +'C';
             GPIO.output(ExtHeater,True);
             sampleHeaters(ExtThermistor,HeatBedThermistor);
@@ -336,7 +336,7 @@ try:#read and execute G code
             #Doing with the RaspPi only would require polling the tempurature(maybe at each Z axis move?)
             print 'Extruder Heater On';
             GPIO.output(ExtHeater,True);
-            extTemp = SinglePosition(lines,'S');
+            extTemp = float(SinglePosition(lines,'S'));
             print 'Extruder Heater On and setting temperature to '+ str(extTemp) +'C';
             print 'Waiting to reach target temp...';
             sampleHeaters(ExtThermistor,HeatBedThermistor);
@@ -349,7 +349,7 @@ try:#read and execute G code
         elif lines[0:4]=='M140': #Set Heat Bed Temperature 
             #need to set temperature here as well
             #for now we will just turn on extruderheater
-            heatBedTemp = SinglePosition(lines,'S');
+            heatBedTemp = float(SinglePosition(lines,'S'));
             print 'Setting Heat Bed temperature to '+ str(heatBedTemp) +'C';
 
         elif lines[0:4]=='M190':  #Set HeatBed Temperature and Wait
@@ -358,7 +358,7 @@ try:#read and execute G code
             #I would like to this all with the raspberry pi but...
             #I may use a simple Arduino(Uno) sketch to handle tempurature regulation 
             #Doing with the RaspPi only would require polling the tempurature(maybe at each Z axis move?)
-            heatBedTemp = SinglePosition(lines,'S');
+            heatBedTemp = float(SinglePosition(lines,'S'));
             print 'HeatBed Heater On';
             print 'Setting HeatBed temperature to '+ str(heatBedTemp) +'C and waiting';
             GPIO.output(HeatBed,True);
