@@ -3,6 +3,7 @@ import Motor_control_new
 from Bipolar_Stepper_Motor_Class_new import Bipolar_Stepper_Motor
 import time
 from numpy import pi, sin, cos, sqrt, arccos, arcsin
+from collections import deque
 
 ################################################################################################
 ################################################################################################
@@ -41,6 +42,8 @@ Engraving_speed=40; #unit=mm/sec=0.04in/sec
 
 extTemp = 0; #global variable for current tempurature settings
 heatBedTemp = 0;
+extTempQueue = deque()
+heatBedTemp = deque()
 
 #######B#########################################################################################
 ################################################################################################
