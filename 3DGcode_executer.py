@@ -42,8 +42,8 @@ Engraving_speed=40; #unit=mm/sec=0.04in/sec
 
 extTemp = 0; #global variable for current tempurature settings
 heatBedTemp = 0;
-extTempQueue = deque()
-heatBedTemp = deque()
+extTempQue = deque()
+heatBedTempQue = deque()
 
 #######B#########################################################################################
 ################################################################################################
@@ -92,7 +92,26 @@ def get555PulseHighTime(pin):
     		counter += 1;
     		time.sleep(0.001); # may try to change this to 0.0001 for more resolution
     	return float(counter);
-    		
+    	
+		 
+ #This function takes in the current temp and name of heater and returns the current average  
+ #of the last three tempurature readings.  This avoids issues with reading spikes 
+ def getAverageTempFromQue(temp, name): 
+	retTemp = 0; 
+	if(name == "Extruder"): 
+		if(len(extTempQue) > 2): 
+			extTempQue.pop();			 
+		extTempQue.appendleft(temp)	 
+		retTemp = average(extTempQue); 
+ 	else 
+ 		if(len(heatBedTempQue) > 2): 
+			heatBedTempQue.pop();			 
+		heatBedTempQue.appendleft(temp)	 
+		retTemp = average(extTempQue); 
+		 
+ 	return retTemp; 
+
+		
 #this function gets the rise time from a pin(thermistor pin) from the 555 timer out and cross reference with 
 #tempurature table to return the estimated current temperature of the cooresponding heater.
 def getTempFromTable(pin):
