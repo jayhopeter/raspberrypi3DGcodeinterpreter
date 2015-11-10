@@ -28,38 +28,46 @@ void loop() {
     
   sensorValue = sensortotal/10;
   //Serial.println(sensorValue);
-  if(sensorValue <= maxTemp-20)
-  {
-    analogWrite(ledPin,0);
-  }
-  else if(sensorValue > maxTemp-20 && sensorValue <= maxTemp-17)
-  {
-    analogWrite(ledPin,30);
-  }
-  else if(sensorValue > maxTemp-17 && sensorValue <= maxTemp-14)
-  {
-    analogWrite(ledPin,60);
-  }
-  else if(sensorValue > maxTemp-14 && sensorValue <= maxTemp-11)
-  {
-    analogWrite(ledPin,100);
-  }
-  else if(sensorValue > maxTemp-11 && sensorValue <= maxTemp-8)
-  {
-    analogWrite(ledPin,125);
-  }
-  else if(sensorValue > maxTemp-8 && sensorValue <= maxTemp-5)
-  {
-    analogWrite(ledPin,170);
-  }
-  else if(sensorValue > maxTemp-5 && sensorValue<= maxTemp)
-  {
-    analogWrite(ledPin,205);
-  }
-  else if(sensorValue > maxTemp)
-  {
-    analogWrite(ledPin,250);
-  }
+  //the quick way
+  // map it to the range of the analog out:
+  int outputValue = 0;
+  outputValue = map(sensorValue, maxTemp-20, maxTemp, 0, 255);
+  // change the analog out value:
+  analogWrite(ledPin, outputValue);
+  
+  //the dumb way
+//  if(sensorValue <= maxTemp-20)
+//  {
+//    analogWrite(ledPin,0);
+//  }
+//  else if(sensorValue > maxTemp-20 && sensorValue <= maxTemp-17)
+//  {
+//    analogWrite(ledPin,30);
+//  }
+//  else if(sensorValue > maxTemp-17 && sensorValue <= maxTemp-14)
+//  {
+//    analogWrite(ledPin,60);
+//  }
+//  else if(sensorValue > maxTemp-14 && sensorValue <= maxTemp-11)
+//  {
+//    analogWrite(ledPin,100);
+//  }
+//  else if(sensorValue > maxTemp-11 && sensorValue <= maxTemp-8)
+//  {
+//    analogWrite(ledPin,125);
+//  }
+//  else if(sensorValue > maxTemp-8 && sensorValue <= maxTemp-5)
+//  {
+//    analogWrite(ledPin,170);
+//  }
+//  else if(sensorValue > maxTemp-5 && sensorValue<= maxTemp)
+//  {
+//    analogWrite(ledPin,205);
+//  }
+//  else if(sensorValue > maxTemp)
+//  {
+//    analogWrite(ledPin,250);
+//  }
   
   sensortotal = 0;
   ctr = 0;
