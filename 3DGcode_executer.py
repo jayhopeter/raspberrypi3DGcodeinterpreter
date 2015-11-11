@@ -109,7 +109,7 @@ def get555PulseHighTime(pin):
 		heatBedTempQue.appendleft(temp)	 
 		retTemp = average(extTempQue); 
 		 
- 	return retTemp; 
+ 	return float(retTemp); 
 
 		
 #this function gets the rise time from a pin(thermistor pin) from the 555 timer out and cross reference with 
@@ -132,13 +132,15 @@ def getTempFromTable(pin):
 
 #polling tempurature and setting to +/- 20degC of supplied tempfrom GCode
 def checkTemps():
-	if (getTempFromTable(ExtThermistor) - 10) >= extTemp:
+	curExtTemp = getTempFromTable(ExtThermistor);
+	curHeatBedTemp = getTempFromTable(HeatBedThermistor);
+	if (curExtTemp - 10) >= extTemp:
 		GPIO.output(ExtHeater, False);
-	elif(getTempFromTable(ExtThermistor) + 10) <= extTemp:
+	elif(curExtTemp + 10) <= extTemp:
 		GPIO.output(ExtHeater, True);
-	if (getTempFromTable(HeatBedThermistor) - 10) >= heatBedTemp:
+	if (curHeatBedTemp - 10) >= heatBedTemp:
 		GPIO.output(HeatBed, False);
-	elif(getTempFromTable(HeatBedThermistor) + 10) <= heatBedTemp:
+	elif(curHeatBedTemp + 10) <= heatBedTemp:
 		GPIO.output(HeatBed, True);
 
 def PenOff(ZMotor):
@@ -365,7 +367,7 @@ try:#read and execute G code
             temp = getTempFromTable(ExtThermistor)
             while temp < extTemp:
             	time.sleep(0.2);
-            	temp = getTempFromTable(ExtThermistor)
+            	temp = getAverageTempFromQue(getTempFromTable(ExtThermistor), "Extruder");
             	print str(temp);
             	
         elif lines[0:4]=='M140': #Set Heat Bed Temperature 
@@ -388,7 +390,7 @@ try:#read and execute G code
             temp = getTempFromTable(HeatBedThermistor)
             while temp < heatBedTemp:
             	time.sleep(0.2);
-            	temp = getTempFromTable(HeatBedThermistor)
+            	temp = getAverageTempFromQue(getTempFromTable(HeatBedThermistor), "HeatBed");
             	print str(temp);
             
         elif (lines[0:3]=='G1F')|(lines[0:4]=='G1 F'):
