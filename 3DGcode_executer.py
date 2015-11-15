@@ -103,7 +103,7 @@ def getAverageTempFromQue(temp, name):
 			extTempQue.pop();			 
 		extTempQue.appendleft(temp)	 
 		retTemp = average(extTempQue); 
- 	else 
+ 	else:
  		if(len(heatBedTempQue) > 2): 
 			heatBedTempQue.pop();			 
 		heatBedTempQue.appendleft(temp)	 
