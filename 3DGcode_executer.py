@@ -95,8 +95,8 @@ def get555PulseHighTime(pin):
     	
 		 
  #This function takes in the current temp and name of heater and returns the current average  
- #of the last three tempurature readings.  This avoids issues with reading spikes 
- def getAverageTempFromQue(temp, name): 
+ #of the last three tempurature readings.  This avoids issues with reading spikes
+def getAverageTempFromQue(temp, name): 
 	retTemp = 0; 
 	if(name == "Extruder"): 
 		if(len(extTempQue) > 2): 
