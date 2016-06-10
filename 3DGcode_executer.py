@@ -293,6 +293,7 @@ def movetothree(MX,x_pos,dx,MY,y_pos,dy,MExt,ext_pos,dext,speed,engraving):
 ###########################################################################################
 ###########################################################################################
 #to do  G28, M107, M104, M109, M106, M190
+#GCode defintion reference: http://reprap.org/wiki/G-code
 #Bug - motion is slow on XY moves when steps are ~50 or more on each, speed issue?
 try:#read and execute G code
     lineCtr = 1;
