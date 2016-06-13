@@ -63,7 +63,7 @@ def Motor_Step(stepper1, step1, stepper2, step2, speed):
 
     if step1==0:
         total_micro_step=step2;
-    	micro_step2=1;
+        micro_step2=1;
         micro_step1=step2+100;  #set [micro_step1]>[total_micro_step], so stepper motor will not turn
     elif step2==0:
         total_micro_step=step1;
@@ -114,7 +114,7 @@ def Motor_StepThree(stepper1, step1, stepper2, step2,stepper3,step3, speed):
         total_micro_step=LCM(step2,step3);
         micro_step2=total_micro_step/step2;
         micro_step3=total_micro_step/step3;
-    	micro_step1=step2+100;
+        micro_step1=step2+100;
 ##        total_micro_step=step2;
 ##    	micro_step2=1;
 ##        micro_step1=step2+100;  #set [micro_step1]>[total_micro_step], so stepper motor will not turn
@@ -122,7 +122,7 @@ def Motor_StepThree(stepper1, step1, stepper2, step2,stepper3,step3, speed):
         total_micro_step=LCM(step1,step3);
         micro_step1=total_micro_step/step1;
         micro_step3=total_micro_step/step3;
-    	micro_step2=step1+100;
+        micro_step2=step1+100;
 ##        total_micro_step=step1;
 ##        micro_step1=1;
 ##        micro_step2=step1+100;

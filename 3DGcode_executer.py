@@ -88,10 +88,10 @@ def sampleHeaterDutyCycle(pin, name):
 def get555PulseHighTime(pin):
 	counter = 0;
 	GPIO.wait_for_edge(pin, GPIO.RISING);
-    	while GPIO.input(pin) == GPIO.HIGH:
-    		counter += 1;
-    		time.sleep(0.001); # may try to change this to 0.0001 for more resolution
-    	return float(counter);
+    while GPIO.input(pin) == GPIO.HIGH:
+        counter += 1;
+    	time.sleep(0.001); # may try to change this to 0.0001 for more resolution
+    return float(counter);
     	
 		 
  #This function takes in the current temp and name of heater and returns the current average  
