@@ -86,49 +86,46 @@ def sampleHeaterDutyCycle(pin, name):
     writeToLog(name+ " Estimated Tempurature "+ str(estTemp)+"\n")
     
 def get555PulseHighTime(pin):
-	counter = 0;
-	GPIO.wait_for_edge(pin, GPIO.RISING);
+    counter = 0;
+    GPIO.wait_for_edge(pin, GPIO.RISING);
     while GPIO.input(pin) == GPIO.HIGH:
         counter += 1;
-    	time.sleep(0.001); # may try to change this to 0.0001 for more resolution
+        time.sleep(0.001); # may try to change this to 0.0001 for more resolution
     return float(counter);
-    	
-		 
- #This function takes in the current temp and name of heater and returns the current average  
- #of the last three tempurature readings.  This avoids issues with reading spikes
-def getAverageTempFromQue(temp, name): 
-	retTemp = 0; 
-	if(name == "Extruder"): 
-		if(len(extTempQue) > 2): 
-			extTempQue.pop();			 
-		extTempQue.appendleft(temp)	 
-		retTemp = sum(extTempQue)/len(extTempQue); 
- 	else:
- 		if(len(heatBedTempQue) > 2): 
-			heatBedTempQue.pop();			 
-		heatBedTempQue.appendleft(temp)	 
-		retTemp = sum(heatBedTempQue)/len(heatBedTempQue); 
-		 
- 	return float(retTemp); 
 
-		
+#This function takes in the current temp and name of heater and returns the current average  
+ #of the last three tempurature readings.  This avoids issues with reading spikes
+def getAverageTempFromQue(temp, name):
+    retTemp = 0;
+    if(name == "Extruder"):
+        if(len(extTempQue) > 2):
+            extTempQue.pop();
+        extTempQue.appendleft(temp)
+        retTemp = sum(extTempQue)/len(extTempQue);
+    else:
+        if(len(heatBedTempQue) > 2):
+            heatBedTempQue.pop();
+        heatBedTempQue.appendleft(temp)
+        retTemp = sum(heatBedTempQue)/len(heatBedTempQue);
+    return float(retTemp);
+
 #this function gets the rise time from a pin(thermistor pin) from the 555 timer out and cross reference with 
 #tempurature table to return the estimated current temperature of the cooresponding heater.
 def getTempFromTable(pin):
-	pulseHighTime = get555PulseHighTime(pin);
-	estTemp = 0;
-	#read from tempurate text file and return estimated temp from pulse time
-	linectr = 0;
-	for lines in open('Thermistor555TimerTempChart.txt','r'):
-            if linectr > 5:
-                lineSplit = lines.split();
-                if float(lineSplit[2]) <= pulseHighTime:
-                    estTemp = lineSplit[1];
-                    break
-            linectr += 1;
+    pulseHighTime = get555PulseHighTime(pin);
+    estTemp = 0;
+    #read from tempurate text file and return estimated temp from pulse time
+    linectr = 0;
+    for lines in open('Thermistor555TimerTempChart.txt','r'):
+        if linectr > 5:
+            lineSplit = lines.split();
+            if float(lineSplit[2]) <= pulseHighTime:
+                estTemp = lineSplit[1];
+                break
+        linectr += 1;
         #if estTemp == 0: #causing temp sensing error
             #estTemp = 250; #more than max temp
-	return float(estTemp);
+    return float(estTemp);
 
 #polling tempurature and setting to +/- 20degC of supplied tempfrom GCode
 def checkTemps():
@@ -146,7 +143,7 @@ def checkTemps():
 def PenOff(ZMotor):
     # move ZAxis ~5 steps up
     ZMotor.move(1,5)
-	
+
 def PenOn(ZMotor):
     # move ZAxis ~5 steps down
     ZMotor.move(-1,5)
@@ -177,7 +174,7 @@ def homeAxis(motor,endStopPin):
     #in the middle of a program.  I'm not sure if this is even possible but I'm assuming it is.
     GPIO.setup(endStopPin,GPIO.OUT);
     GPIO.output(endStopPin, True);
-    motor.move(1,1);
+    motor.move(1,3);
     #Then step endstop GPIO back to input.
     GPIO.output(endStopPin, False);
     GPIO.setup(endStopPin,GPIO.IN,pull_up_down=GPIO.PUD_DOWN); # pull_up_down=GPIO.PUD_UP  or pull_up_down=GPIO.PUD_DOWN
@@ -459,9 +456,9 @@ try:#read and execute G code
             sintheta=(Dx*e2[0]+Dy*e2[1])/r**2;        #theta is the angule spanned by the circular interpolation curve
                 
             if costheta>1:  # there will always be some numerical errors! Make sure abs(costheta)<=1
-		costheta=1;
-	    elif costheta<-1:
-		costheta=-1;
+                costheta=1;
+            elif costheta<-1:
+                costheta=-1;
 
             theta=arccos(costheta);
             if sintheta<0:
