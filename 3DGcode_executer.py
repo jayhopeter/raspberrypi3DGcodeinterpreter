@@ -174,7 +174,7 @@ def homeAxis(motor,endStopPin):
     #in the middle of a program.  I'm not sure if this is even possible but I'm assuming it is.
     GPIO.setup(endStopPin,GPIO.OUT);
     GPIO.output(endStopPin, True);
-    motor.move(1,3);
+    motor.move(1,5);
     #Then step endstop GPIO back to input.
     GPIO.output(endStopPin, False);
     GPIO.setup(endStopPin,GPIO.IN,pull_up_down=GPIO.PUD_DOWN); # pull_up_down=GPIO.PUD_UP  or pull_up_down=GPIO.PUD_DOWN
