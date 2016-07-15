@@ -128,10 +128,9 @@ def getTempFromTable(pin):
     return float(estTemp);
 
 #polling tempurature and setting to +/- 20degC of supplied tempfrom GCode
-#TODO Need to have checkTemps get an average of the current tempurature to avoid spikes see getAverageTempFromQue
 def checkTemps():
-	curExtTemp = getTempFromTable(ExtThermistor);
-	curHeatBedTemp = getTempFromTable(HeatBedThermistor);
+	curExtTemp = (getTempFromTable(ExtThermistor), "Extruder");#getTempFromTable(ExtThermistor);
+	curHeatBedTemp = (getTempFromTable(HeatBedThermistor), "HeatBed");#getTempFromTable(HeatBedThermistor);
 	if (curExtTemp - 10) >= extTemp:
 		GPIO.output(ExtHeater, False);
 	elif(curExtTemp + 10) <= extTemp:
