@@ -129,8 +129,8 @@ def getTempFromTable(pin):
 
 #polling tempurature and setting to +/- 20degC of supplied tempfrom GCode
 def checkTemps():
-	curExtTemp = (getTempFromTable(ExtThermistor), "Extruder");#getTempFromTable(ExtThermistor);
-	curHeatBedTemp = (getTempFromTable(HeatBedThermistor), "HeatBed");#getTempFromTable(HeatBedThermistor);
+	curExtTemp = getAverageTempFromQue(getTempFromTable(ExtThermistor), "Extruder");#getTempFromTable(ExtThermistor);
+	curHeatBedTemp = getAverageTempFromQue(getTempFromTable(HeatBedThermistor), "HeatBed");#getTempFromTable(HeatBedThermistor);
 	if (curExtTemp - 10) >= extTemp:
 		GPIO.output(ExtHeater, False);
 	elif(curExtTemp + 10) <= extTemp:
@@ -292,9 +292,10 @@ def movetothree(MX,x_pos,dx,MY,y_pos,dy,MExt,ext_pos,dext,speed,engraving):
 #TODO  G28, M107, M106
 #GCode defintion reference: http://reprap.org/wiki/G-code
 #Bug - motion is slow on XY moves when steps are ~50 or more on each, speed issue?
-#TODO We need to check temp more often, now we are only doing it on Z axis moves, threading would be the best solution. For a quick we can call checktemps every 3rd Ext move
+#TODO threading for temperature management. For a quick fix now we call checktemps every 25th Ext move
 try:#read and execute G code
     lineCtr = 1;
+    heaterCheck = 1;
     for lines in open(filename,'r'):
         print 'processing line# '+str(lineCtr)+ ': '+lines;
         lineCtr += 1;
@@ -420,6 +421,7 @@ try:#read and execute G code
             else:                
                 [x_pos,y_pos,ext_pos]=XYExtposition(lines);
                 movetothree(MX,x_pos,dx,MY,y_pos,dy,MExt,ext_pos,dext,speed,engraving);
+                heaterCheck += 1;
                 #create new moveto function to include Extruder postition
             
         elif (lines[0:3]=='G02')|(lines[0:3]=='G03'): #circular interpolation
@@ -479,6 +481,8 @@ try:#read and execute G code
                		moveto(MX,tmp_x_pos,dx,MY, tmp_y_pos,dy,speed,True);
                	else:
                		movetothree(MX,tmp_x_pos,dx,MY, tmp_y_pos,dy,MExt,MExt.position+extruderMovePerStep,dext,speed,True);
+        if heaterCheck % 25 == 0: #checking every twentyfifth extruder motor move 
+            checkTemps();
         
 except KeyboardInterrupt:
     pass
