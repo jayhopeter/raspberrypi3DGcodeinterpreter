@@ -289,9 +289,10 @@ def movetothree(MX,x_pos,dx,MY,y_pos,dy,MExt,ext_pos,dext,speed,engraving):
 #################                           ###############################################
 ###########################################################################################
 ###########################################################################################
-#to do  G28, M107, M104, M109, M106, M190
+#TODO  G28, M107, M106
 #GCode defintion reference: http://reprap.org/wiki/G-code
 #Bug - motion is slow on XY moves when steps are ~50 or more on each, speed issue?
+#TODO We need to check temp more often, now we are only doing it on Z axis moves, threading would be the best solution. For a quick we can call checktemps every 3rd Ext move
 try:#read and execute G code
     lineCtr = 1;
     for lines in open(filename,'r'):
