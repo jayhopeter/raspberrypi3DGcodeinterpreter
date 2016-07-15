@@ -75,7 +75,7 @@ def Motor_Step(stepper1, step1, stepper2, step2, speed):
         micro_step2=total_micro_step/step2;
 
     T=sqrt(step1**2+step2**2)/speed;      #total time
-    dt=T/total_micro_step;                #time delay every micro_step
+    dt=T/(step1+step2);                #time delay every step
     
     for i in range(1,total_micro_step+1):    #i is the iterator for the micro_step. i cannot start from 0
         #time_laps=0;
@@ -133,7 +133,7 @@ def Motor_StepThree(stepper1, step1, stepper2, step2,stepper3,step3, speed):
         micro_step3=total_micro_step/step3;
 
     T=sqrt(step1**2+step2**2)/speed;      #total time
-    dt=T/total_micro_step;                #time delay every micro_step
+    dt=T/(step1+step2);                #time delay every micro_step
     
     for i in range(1,total_micro_step+1):    #i is the iterator for the micro_step. i cannot start from 0
         #time_laps=0;

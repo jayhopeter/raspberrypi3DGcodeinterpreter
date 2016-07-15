@@ -21,7 +21,7 @@ MX=Bipolar_Stepper_Motor(17,4);     #pin number for a1,a2,b1,b2.  a1 and a2 form
 MY=Bipolar_Stepper_Motor(23,18);       
 MZ=Bipolar_Stepper_Motor(24,25);
 MExt=Bipolar_Stepper_Motor(27,22);
-#EndStop/Home Axis code needed still
+#TODO EndStop/Home Axis code needed still testing they should be tied to the enable pins of each motor
 EndStopX = 14
 EndStopY = 15
 EndStopZ = 7
@@ -128,6 +128,7 @@ def getTempFromTable(pin):
     return float(estTemp);
 
 #polling tempurature and setting to +/- 20degC of supplied tempfrom GCode
+#TODO Need to have checkTemps get an average of the current tempurature to avoid spikes see getAverageTempFromQue
 def checkTemps():
 	curExtTemp = getTempFromTable(ExtThermistor);
 	curHeatBedTemp = getTempFromTable(HeatBedThermistor);
@@ -406,6 +407,7 @@ try:#read and execute G code
             elif(lines.find('X') < 0 and lines.find('Z') < 0): #Extruder only
                 ext_pos = SinglePosition(lines,'E');
                 stepsExt = int(round(ext_pos/dext)) - MExt.position;
+                #TODO fix this extMotor Delay
                 Motor_control_new.Single_Motor_Step(MExt,stepsExt,50);
                 #still need to move Extruder using stepExt(signed int)
             elif(lines.find('X') < 0 and lines.find('E') < 0): #Z Axis only
