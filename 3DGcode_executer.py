@@ -409,13 +409,13 @@ try:#read and execute G code
                 ext_pos = SinglePosition(lines,'E');
                 stepsExt = int(round(ext_pos/dext)) - MExt.position;
                 #TODO fix this extMotor Delay
-                Motor_control_new.Single_Motor_Step(MExt,stepsExt,50);
+                Motor_control_new.Single_Motor_Step(MExt,stepsExt,30);
                 #still need to move Extruder using stepExt(signed int)
             elif(lines.find('X') < 0 and lines.find('E') < 0): #Z Axis only
                 print 'Moving Z axis only';
                 z_pos = SinglePosition(lines,'Z');
                 stepsZ = int(round(z_pos/dz)) - MZ.position;
-                Motor_control_new.Single_Motor_Step(MZ,stepsZ,50);
+                Motor_control_new.Single_Motor_Step(MZ,stepsZ,60);
                 #check Extruder and Heat Bed temp after Z axiz move
                 checkTemps();
             else:                
