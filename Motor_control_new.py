@@ -23,7 +23,7 @@ def sign(a): #return the sign of number a
     else:
         return 0;
 
-def Single_Motor_Step(stepper, step, speed):
+def Single_Motor_Step(stepper, step, speed=50):
 #   control stepper motor 1 and 2 simultaneously
 #   stepper1 and stepper2 are objects of Bipolar_Stepper_Motor class
 #   direction is reflected in the polarity of [step1] or [step2]
@@ -39,9 +39,9 @@ def Single_Motor_Step(stepper, step, speed):
 
     
 
-    #T=step/speed;      #total time
-                    #time delay every micro_step
-    stepper.move(dir1,step);
+    T=step/speed;      #total time
+    dt= T/step;                #time delay every micro_step
+    stepper.move(dir1,step,dt);
     
     return 0;
     
@@ -75,19 +75,19 @@ def Motor_Step(stepper1, step1, stepper2, step2, speed):
         micro_step2=total_micro_step/step2;
 
     T=sqrt(step1**2+step2**2)/speed;      #total time
-    dt=T/total_micro_step;                #time delay every micro_step
+    dt=T/(step1+step2);                #time delay every step
     
     for i in range(1,total_micro_step+1):    #i is the iterator for the micro_step. i cannot start from 0
-        time_laps=0;
+        #time_laps=0;
         if ((i % micro_step1)==0):#motor 1 need to turn one step
-            stepper1.move(dir1,1,dt/4.0);
-            time_laps+=dt/4.0;
+            stepper1.move(dir1,1,dt);
+            #time_laps+=dt/4.0;
             
         if ((i % micro_step2)==0):#motor 2 need to turn one step
-            stepper2.move(dir2,1,dt/4.0);
-            time_laps+=dt/4.0;
+            stepper2.move(dir2,1,dt);
+            #time_laps+=dt/4.0;
         
-        time.sleep(dt-time_laps);
+        #time.sleep(dt-time_laps);
 
     return 0;
 
@@ -133,22 +133,22 @@ def Motor_StepThree(stepper1, step1, stepper2, step2,stepper3,step3, speed):
         micro_step3=total_micro_step/step3;
 
     T=sqrt(step1**2+step2**2)/speed;      #total time
-    dt=T/total_micro_step;                #time delay every micro_step
+    dt=T/(step1+step2);                #time delay every micro_step
     
     for i in range(1,total_micro_step+1):    #i is the iterator for the micro_step. i cannot start from 0
-        time_laps=0;
+        #time_laps=0;
         if ((i % micro_step1)==0):#motor 1 need to turn one step
-            stepper1.move(dir1,1,dt/4.0);
-            time_laps+=dt/4.0;
+            stepper1.move(dir1,1,dt);
+            #time_laps+=dt/4.0;
             
         if ((i % micro_step2)==0):#motor 2 need to turn one step
-            stepper2.move(dir2,1,dt/4.0);
-            time_laps+=dt/4.0;
+            stepper2.move(dir2,1,dt);
+            #time_laps+=dt/4.0;
 
         if ((i % micro_step3)==0):#Ext motor need to turn one step
-            stepper3.move(dir3,1,dt/4.0);
+            stepper3.move(dir3,1);
             #time_laps+=dt/4.0;
         
-        time.sleep(dt-time_laps);
+        #time.sleep(dt-time_laps);
 
     return 0;
