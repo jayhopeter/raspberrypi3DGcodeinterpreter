@@ -36,7 +36,7 @@ inputs = [ExtThermistor,HeatBedThermistor,EndStopX,EndStopY,EndStopZ];
 dx=0.25; #resolution in x direction. Unit: mm  http://prusaprinters.org/calculator/
 dy=0.25; #resolution in y direction. Unit: mm  http://prusaprinters.org/calculator/
 dz=0.004; #resolution in Z direction. Unit: mm  http://prusaprinters.org/calculator/
-dext=0.042; # resolution for Extruder Unit: mm http://forums.reprap.org/read.php?1,144245
+dext=0.42; # resolution for Extruder Unit: mm http://forums.reprap.org/read.php?1,144245
 
 Engraving_speed=40; #unit=mm/sec=0.04in/sec
 
