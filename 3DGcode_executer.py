@@ -13,7 +13,7 @@ from collections import deque
 ################################################################################################
 ################################################################################################
 
-filename='fixedSmallGear.gcode'; #file name of the G code commands
+filename='pizero-scover.gcode'; #file name of the G code commands
 
 GPIO.setmode(GPIO.BCM)
 print GPIO.VERSION
@@ -33,12 +33,15 @@ HeatBedThermistor = 8
 outputs = [ExtHeater,HeatBed];
 inputs = [ExtThermistor,HeatBedThermistor,EndStopX,EndStopY,EndStopZ];
 
-dx=0.25; #resolution in x direction. Unit: mm  http://prusaprinters.org/calculator/
-dy=0.25; #resolution in y direction. Unit: mm  http://prusaprinters.org/calculator/
-dz=0.004; #resolution in Z direction. Unit: mm  http://prusaprinters.org/calculator/
-dext=0.042; # resolution for Extruder Unit: mm http://forums.reprap.org/read.php?1,144245
 
-Engraving_speed=40; #unit=mm/sec=0.04in/sec
+dx=0.205; #resolution in x direction. Unit: mm  http://prusaprinters.org/calculator/
+dy=0.205; #resolution in y direction. Unit: mm  http://prusaprinters.org/calculator/
+dz=0.004; #resolution in Z direction. Unit: mm  http://prusaprinters.org/calculator/
+dext=0.038; # resolution for Extruder Unit: mm http://forums.reprap.org/read.php?1,144245
+
+
+#Engraving_speed=40; #unit=mm/sec=0.04in/sec
+Engraving_speed=20;
 
 extTemp = 0; #global variable for current tempurature settings
 heatBedTemp = 0;
@@ -275,10 +278,10 @@ def movetothree(MX,x_pos,dx,MY,y_pos,dy,MExt,ext_pos,dext,speed,engraving):
             
     if Total_step>0:
         if lines[0:3]=='G0 ': #fast movement
-            print 'No Laser, fast movement: Dx=', stepx, '  Dy=', stepy;
+            print 'fast movement: Dx=', stepx, '  Dy=', stepy;
             Motor_control_new.Motor_StepThree(MX,stepx,MY,stepy,MExt,stepExt,50);
         else:
-            print 'Laser on, movement: Dx=', stepx, '  Dy=', stepy;
+            print 'movement: Dx=', stepx, '  Dy=', stepy, '  Dex=', stepExt;
             Motor_control_new.Motor_StepThree(MX,stepx,MY,stepy,MExt,stepExt,speed);
     return 0;
 
@@ -481,8 +484,9 @@ try:#read and execute G code
                		moveto(MX,tmp_x_pos,dx,MY, tmp_y_pos,dy,speed,True);
                	else:
                		movetothree(MX,tmp_x_pos,dx,MY, tmp_y_pos,dy,MExt,MExt.position+extruderMovePerStep,dext,speed,True);
-        if heaterCheck % 25 == 0: #checking every twentyfifth extruder motor move 
+        if heaterCheck % 5 == 0: #checking every fifth extruder motor move 
             checkTemps();
+            print 'Checking Temps';
         
 except KeyboardInterrupt:
     pass
