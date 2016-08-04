@@ -34,14 +34,14 @@ outputs = [ExtHeater,HeatBed];
 inputs = [ExtThermistor,HeatBedThermistor,EndStopX,EndStopY,EndStopZ];
 
 
-dx=0.205; #resolution in x direction. Unit: mm  http://prusaprinters.org/calculator/
-dy=0.205; #resolution in y direction. Unit: mm  http://prusaprinters.org/calculator/
+dx=0.21; #resolution in x direction. Unit: mm  http://prusaprinters.org/calculator/
+dy=0.21; #resolution in y direction. Unit: mm  http://prusaprinters.org/calculator/
 dz=0.004; #resolution in Z direction. Unit: mm  http://prusaprinters.org/calculator/
 dext=0.038; # resolution for Extruder Unit: mm http://forums.reprap.org/read.php?1,144245
 
 
 #Engraving_speed=40; #unit=mm/sec=0.04in/sec
-Engraving_speed=20;
+Engraving_speed=10;
 
 extTemp = 0; #global variable for current tempurature settings
 heatBedTemp = 0;
