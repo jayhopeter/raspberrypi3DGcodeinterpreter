@@ -13,7 +13,7 @@ from collections import deque
 ################################################################################################
 ################################################################################################
 
-filename='pizero-scover.gcode'; #file name of the G code commands
+filename='Gcode/BellaRing.gcode'; #file name of the G code commands
 
 GPIO.setmode(GPIO.BCM)
 print GPIO.VERSION
@@ -41,7 +41,7 @@ dext=0.038; # resolution for Extruder Unit: mm http://forums.reprap.org/read.php
 
 
 #Engraving_speed=40; #unit=mm/sec=0.04in/sec
-Engraving_speed=10;
+Engraving_speed=6;
 
 extTemp = 0; #global variable for current tempurature settings
 heatBedTemp = 0;
@@ -134,13 +134,13 @@ def getTempFromTable(pin):
 def checkTemps():
 	curExtTemp = getAverageTempFromQue(getTempFromTable(ExtThermistor), "Extruder");#getTempFromTable(ExtThermistor);
 	curHeatBedTemp = getAverageTempFromQue(getTempFromTable(HeatBedThermistor), "HeatBed");#getTempFromTable(HeatBedThermistor);
-	if (curExtTemp - 10) >= extTemp:
+	if (curExtTemp - 5) >= extTemp:
 		GPIO.output(ExtHeater, False);
-	elif(curExtTemp + 10) <= extTemp:
+	elif(curExtTemp + 5) <= extTemp:
 		GPIO.output(ExtHeater, True);
-	if (curHeatBedTemp - 10) >= heatBedTemp:
+	if (curHeatBedTemp - 5) >= heatBedTemp:
 		GPIO.output(HeatBed, False);
-	elif(curHeatBedTemp + 10) <= heatBedTemp:
+	elif(curHeatBedTemp + 5) <= heatBedTemp:
 		GPIO.output(HeatBed, True);
 
 def PenOff(ZMotor):
@@ -484,8 +484,9 @@ try:#read and execute G code
                		moveto(MX,tmp_x_pos,dx,MY, tmp_y_pos,dy,speed,True);
                	else:
                		movetothree(MX,tmp_x_pos,dx,MY, tmp_y_pos,dy,MExt,MExt.position+extruderMovePerStep,dext,speed,True);
-        if heaterCheck % 5 == 0: #checking every fifth extruder motor move 
+        if heaterCheck >= 10: #checking every fifth extruder motor move 
             checkTemps();
+            heaterCheck = 0;
             print 'Checking Temps';
         
 except KeyboardInterrupt:
