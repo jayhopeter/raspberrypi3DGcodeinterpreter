@@ -404,6 +404,10 @@ try:#read and execute G code
                 engraving=False;
             else:
                 engraving=True;
+			
+			#Update F Value(speed) if available 			
+			if(lines.find('F') >= 0):
+				speed = (SinglePosition(lines,'F')/60)/min(dx,dy);  #getting F value as mm/min so we need to convert to mm/sec then calc and update speed
 
             if(lines.find('E') < 0 and lines.find('Z') < 0):
                 [x_pos,y_pos]=XYposition(lines);
