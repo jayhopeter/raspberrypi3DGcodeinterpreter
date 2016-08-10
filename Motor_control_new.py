@@ -20,9 +20,9 @@ def Single_Motor_Step(stepper, step, speed=50):
 
     step = abs(step)
 
-    T = step / speed      #total time
-    dt = T / step                #time delay every micro_step
-    stepper.move(dir1,step,dt) # don't pass dt here, not working for Z Axis have to figure out why?
+    #T = step / speed      #total time
+    #dt = T / step                #time delay every micro_step
+    stepper.move(dir1,step,1/speed) # don't pass dt here, not working for Z Axis have to figure out why?
     
     return 0
     
