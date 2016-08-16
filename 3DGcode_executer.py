@@ -2,8 +2,11 @@ import RPi.GPIO as GPIO
 import Motor_control_new
 from Bipolar_Stepper_Motor_Class_new import Bipolar_Stepper_Motor
 import time
-from numpy import pi, sin, cos, sqrt, arccos, arcsin
+from numpy import pi, sin, cos, sqrt, arccos, arcsin, log
 from collections import deque
+import Adafruit_GPIO.SPI as SPI
+import Adafruit_MCP3008
+
 
 ################################################################################################
 ################################################################################################
@@ -13,7 +16,7 @@ from collections import deque
 ################################################################################################
 ################################################################################################
 
-filename='Gcode/BellaRing.gcode'; #file name of the G code commands
+filename='Gcode/cube20hole.gcode'; #file name of the G code commands
 
 GPIO.setmode(GPIO.BCM)
 print GPIO.VERSION
@@ -27,21 +30,38 @@ EndStopY = 15
 EndStopZ = 7
 ExtHeater = 10
 HeatBed = 9
-ExtThermistor = 11
-HeatBedThermistor = 8
+#ExtThermistor = 11
+#HeatBedThermistor = 8
 #note only can set lists with 0.5.8 and above version of RPi.GPIO orginal PI caps out at 0.5.5?
 outputs = [ExtHeater,HeatBed];
-inputs = [ExtThermistor,HeatBedThermistor,EndStopX,EndStopY,EndStopZ];
+inputs = [EndStopX,EndStopY,EndStopZ];
 
+# Software SPI configuration for MCP3008 ADC Chip:
+#Extruder is Channel 0
+#Heat Bed is Channel 1
+CLK  = 11
+MISO = 8
+MOSI = 2
+CS   = 3
+mcp = Adafruit_MCP3008.MCP3008(clk=CLK, cs=CS, miso=MISO, mosi=MOSI)
 
-dx=0.21; #resolution in x direction. Unit: mm  http://prusaprinters.org/calculator/
-dy=0.21; #resolution in y direction. Unit: mm  http://prusaprinters.org/calculator/
+#   Therm Specs: Honeywell 135-103LAF-J01
+#   Resistance @ 25C = 10K Ohms
+#   Beta = 3974 @ 0C/50C
+#
+#   25 C = 298.15 K
+ThermBeta = 3974
+ThermDefaultTempK = 298.15
+ThermDefaultRes = 10000
+
+dx=0.2; #resolution in x direction. Unit: mm  http://prusaprinters.org/calculator/
+dy=0.2; #resolution in y direction. Unit: mm  http://prusaprinters.org/calculator/
 dz=0.004; #resolution in Z direction. Unit: mm  http://prusaprinters.org/calculator/
 dext=0.038; # resolution for Extruder Unit: mm http://forums.reprap.org/read.php?1,144245
 
 
 #Engraving_speed=40; #unit=mm/sec=0.04in/sec
-Engraving_speed=6;
+Engraving_speed=25;
 
 extTemp = 0; #global variable for current tempurature settings
 heatBedTemp = 0;
@@ -77,16 +97,32 @@ def writeToLog(outputText):
     print outputText
 
 #these functions are for debugging purposes only
-def sampleHeaters(extThermPin,heatbeadThermPin):
-    sampleHeaterDutyCycle(extThermPin, "Extruder")
-    sampleHeaterDutyCycle(heatbeadThermPin, "Heated Bed")
+def sampleHeaters(extThermChannel,heatbeadThermChannel):
+    sampleHeaterTemp(extThermChannel, "Extruder")
+    sampleHeaterTemp(heatbeadThermChannel, "Heated Bed")
 
-def sampleHeaterDutyCycle(pin, name):
+def sampleHeaterTemp(channel, name):
     writeToLog("Testing "+ name +" Temperature\n");
-    highTime = get555PulseHighTime(pin);
-    writeToLog(name+ " Thermistor 555 Timer High Pulse Time "+ str(highTime)+"\n")
-    estTemp = getTempFromTable(pin)
+    #highTime = get555PulseHighTime(pin);
+    #writeToLog(name+ " Thermistor 555 Timer High Pulse Time "+ str(highTime)+"\n")
+    estTemp = getTempAtADCChannel(channel)
     writeToLog(name+ " Estimated Tempurature "+ str(estTemp)+"\n")
+
+#function to read ADC channel value and calcuate tempurature of thermistor
+#Values:
+#   Vin = 3.3V
+#   Vout = 3.3V(ADC Value/1024)
+#   R1 = 1K Ohms
+#   R2 = thermRes = Estimated Thermistor Resistance
+#
+#   Beta = 3974 @ 0C/50C
+#
+#   25 C = 298.15 K
+def getTempAtADCChannel(channel):
+    adcVal = mcp.read_adc(channel);
+    Vout = 3.3 * float(adcVal/1024);
+    thermRes = (Vout * 1000)/(3.3 - Vout);
+    return (ThermDefaultTempK * ThermBeta) / Log(ThermDefaultRes/thermRes) / (ThermBeta /  Log(ThermDefaultRes/thermRes) - ThermDefaultTempK);
     
 def get555PulseHighTime(pin):
     counter = 0;
@@ -117,6 +153,7 @@ def getAverageTempFromQue(temp, name):
 def getTempFromTable(pin):
     pulseHighTime = get555PulseHighTime(pin);
     estTemp = 0;
+    print "High Pulse Time Reading: " + str(pulseHighTime);
     #read from tempurate text file and return estimated temp from pulse time
     linectr = 0;
     for lines in open('Thermistor555TimerTempChart.txt','r'):
@@ -404,10 +441,10 @@ try:#read and execute G code
                 engraving=False;
             else:
                 engraving=True;
-			
-			#Update F Value(speed) if available 			
-			if(lines.find('F') >= 0):
-				speed = (SinglePosition(lines,'F')/60)/min(dx,dy);  #getting F value as mm/min so we need to convert to mm/sec then calc and update speed
+                #Update F Value(speed) if available 			
+
+            if(lines.find('F') >= 0):
+                speed = (SinglePosition(lines,'F')/60)/min(dx,dy);  #getting F value as mm/min so we need to convert to mm/sec then calc and update speed
 
             if(lines.find('E') < 0 and lines.find('Z') < 0):
                 [x_pos,y_pos]=XYposition(lines);
@@ -416,7 +453,7 @@ try:#read and execute G code
                 ext_pos = SinglePosition(lines,'E');
                 stepsExt = int(round(ext_pos/dext)) - MExt.position;
                 #TODO fix this extMotor Delay
-                Motor_control_new.Single_Motor_Step(MExt,stepsExt,30);
+                Motor_control_new.Single_Motor_Step(MExt,stepsExt,40);
                 #still need to move Extruder using stepExt(signed int)
             elif(lines.find('X') < 0 and lines.find('E') < 0): #Z Axis only
                 print 'Moving Z axis only';
