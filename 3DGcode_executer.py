@@ -44,6 +44,8 @@ MISO = 8
 MOSI = 2
 CS   = 3
 mcp = Adafruit_MCP3008.MCP3008(clk=CLK, cs=CS, miso=MISO, mosi=MOSI)
+extChannel = 0
+heatBedChannel = 1
 
 #   Therm Specs: Honeywell 135-103LAF-J01
 #   Resistance @ 25C = 10K Ohms
@@ -120,17 +122,9 @@ def sampleHeaterTemp(channel, name):
 #   25 C = 298.15 K
 def getTempAtADCChannel(channel):
     adcVal = mcp.read_adc(channel);
-    Vout = 3.3 * float(adcVal/1024);
+    Vout = 3.3 * (float(adcVal)/1024);
     thermRes = (Vout * 1000)/(3.3 - Vout);
-    return (ThermDefaultTempK * ThermBeta) / Log(ThermDefaultRes/thermRes) / (ThermBeta /  Log(ThermDefaultRes/thermRes) - ThermDefaultTempK);
-    
-def get555PulseHighTime(pin):
-    counter = 0;
-    GPIO.wait_for_edge(pin, GPIO.RISING);
-    while GPIO.input(pin) == GPIO.HIGH:
-        counter += 1;
-        time.sleep(0.001); # may try to change this to 0.0001 for more resolution
-    return float(counter);
+    return ((ThermDefaultTempK * ThermBeta) / log(ThermDefaultRes/thermRes) / (ThermBeta /  log(ThermDefaultRes/thermRes) - ThermDefaultTempK) - 273.15);
 
 #This function takes in the current temp and name of heater and returns the current average  
  #of the last three tempurature readings.  This avoids issues with reading spikes
@@ -148,29 +142,10 @@ def getAverageTempFromQue(temp, name):
         retTemp = sum(heatBedTempQue)/len(heatBedTempQue);
     return float(retTemp);
 
-#this function gets the rise time from a pin(thermistor pin) from the 555 timer out and cross reference with 
-#tempurature table to return the estimated current temperature of the cooresponding heater.
-def getTempFromTable(pin):
-    pulseHighTime = get555PulseHighTime(pin);
-    estTemp = 0;
-    print "High Pulse Time Reading: " + str(pulseHighTime);
-    #read from tempurate text file and return estimated temp from pulse time
-    linectr = 0;
-    for lines in open('Thermistor555TimerTempChart.txt','r'):
-        if linectr > 5:
-            lineSplit = lines.split();
-            if float(lineSplit[2]) <= pulseHighTime:
-                estTemp = lineSplit[1];
-                break
-        linectr += 1;
-        #if estTemp == 0: #causing temp sensing error
-            #estTemp = 250; #more than max temp
-    return float(estTemp);
-
 #polling tempurature and setting to +/- 20degC of supplied tempfrom GCode
 def checkTemps():
-	curExtTemp = getAverageTempFromQue(getTempFromTable(ExtThermistor), "Extruder");#getTempFromTable(ExtThermistor);
-	curHeatBedTemp = getAverageTempFromQue(getTempFromTable(HeatBedThermistor), "HeatBed");#getTempFromTable(HeatBedThermistor);
+	curExtTemp = getAverageTempFromQue(getTempAtADCChannel(extChannel), "Extruder");#getTempFromTable(ExtThermistor);
+	curHeatBedTemp = getAverageTempFromQue(getTempAtADCChannel(heatBedChannel), "HeatBed");#getTempFromTable(HeatBedThermistor);
 	if (curExtTemp - 5) >= extTemp:
 		GPIO.output(ExtHeater, False);
 	elif(curExtTemp + 5) <= extTemp:
@@ -385,7 +360,7 @@ try:#read and execute G code
             extTemp = float(SinglePosition(lines,'S'));
             print 'Extruder Heater On and setting temperature to '+ str(extTemp) +'C';
             GPIO.output(ExtHeater,True);
-            sampleHeaters(ExtThermistor,HeatBedThermistor);
+            sampleHeaters(0,1);
         elif lines[0:4]=='M106': #Fan on 
             #for now we will just print the following text
             print 'Fan On';
@@ -403,11 +378,11 @@ try:#read and execute G code
             extTemp = float(SinglePosition(lines,'S'));
             print 'Extruder Heater On and setting temperature to '+ str(extTemp) +'C';
             print 'Waiting to reach target temp...';
-            sampleHeaters(ExtThermistor,HeatBedThermistor);
-            temp = getTempFromTable(ExtThermistor)
+            sampleHeaters(extChannel,heatBedChannel);
+            temp = getTempAtADCChannel(extChannel)
             while temp < extTemp:
             	time.sleep(0.2);
-            	temp = getAverageTempFromQue(getTempFromTable(ExtThermistor), "Extruder");
+            	temp = getAverageTempFromQue(getTempAtADCChannel(extChannel), "Extruder");
             	print str(temp);
             	
         elif lines[0:4]=='M140': #Set Heat Bed Temperature 
@@ -426,11 +401,11 @@ try:#read and execute G code
             print 'HeatBed Heater On';
             print 'Setting HeatBed temperature to '+ str(heatBedTemp) +'C and waiting';
             GPIO.output(HeatBed,True);
-            sampleHeaters(ExtThermistor,HeatBedThermistor);
-            temp = getTempFromTable(HeatBedThermistor)
+            sampleHeaters(extChannel,heatBedChannel);
+            temp = getTempAtADCChannel(heatBedChannel)
             while temp < heatBedTemp:
             	time.sleep(0.2);
-            	temp = getAverageTempFromQue(getTempFromTable(HeatBedThermistor), "HeatBed");
+            	temp = getAverageTempFromQue(getTempAtADCChannel(heatBedChannel), "HeatBed");
             	print str(temp);
             
         elif (lines[0:3]=='G1F')|(lines[0:4]=='G1 F'):
