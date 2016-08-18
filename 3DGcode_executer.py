@@ -25,8 +25,8 @@ MY=Bipolar_Stepper_Motor(23,18);
 MZ=Bipolar_Stepper_Motor(24,25);
 MExt=Bipolar_Stepper_Motor(27,22);
 #TODO EndStop/Home Axis code needed still testing they should be tied to the enable pins of each motor
-EndStopX = 14
-EndStopY = 15
+EndStopX = 2
+EndStopY = 3
 EndStopZ = 7
 ExtHeater = 10
 HeatBed = 9
@@ -39,10 +39,10 @@ inputs = [EndStopX,EndStopY,EndStopZ];
 # Software SPI configuration for MCP3008 ADC Chip:
 #Extruder is Channel 0
 #Heat Bed is Channel 1
-CLK  = 11
-MISO = 8
-MOSI = 2
-CS   = 3
+CLK  = 8
+MISO = 11
+MOSI = 15
+CS   = 14
 mcp = Adafruit_MCP3008.MCP3008(clk=CLK, cs=CS, miso=MISO, mosi=MOSI)
 extChannel = 0
 heatBedChannel = 1
@@ -146,6 +146,8 @@ def getAverageTempFromQue(temp, name):
 def checkTemps():
 	curExtTemp = getAverageTempFromQue(getTempAtADCChannel(extChannel), "Extruder");#getTempFromTable(ExtThermistor);
 	curHeatBedTemp = getAverageTempFromQue(getTempAtADCChannel(heatBedChannel), "HeatBed");#getTempFromTable(HeatBedThermistor);
+    print "Current Extruder temp: "+ curExtTemp;
+    print "Current HeatBed temp: " + curHeatBedTemp;
 	if (curExtTemp - 5) >= extTemp:
 		GPIO.output(ExtHeater, False);
 	elif(curExtTemp + 5) <= extTemp:
@@ -334,11 +336,11 @@ try:#read and execute G code
             print 'Homing all axis...';
             #move till endstops trigger
             print 'Homing X axis...';
-            homeAxis(MX,EndStopX)
+            #homeAxis(MX,EndStopX)
             print 'Homing Y axis...';
-            homeAxis(MY,EndStopY)
+            #homeAxis(MY,EndStopY)
             print 'Homing Z axis...';
-            homeAxis(MZ,EndStopZ)
+            #homeAxis(MZ,EndStopZ)
             
         elif lines[0:3]=='M05':
             PenOff(MZ)
