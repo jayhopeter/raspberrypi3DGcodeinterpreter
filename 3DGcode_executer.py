@@ -21,12 +21,12 @@ filename='Gcode/cube20hole.gcode'; #file name of the G code commands
 GPIO.setmode(GPIO.BCM)
 print GPIO.VERSION
 MX=Bipolar_Stepper_Motor(17,4);     #pin number for a1,a2,b1,b2.  a1 and a2 form coil A; b1 and b2 form coil B
-MY=Bipolar_Stepper_Motor(23,18);       
+MY=Bipolar_Stepper_Motor(23,18);
 MZ=Bipolar_Stepper_Motor(24,25);
 MExt=Bipolar_Stepper_Motor(27,22);
 #TODO EndStop/Home Axis code needed still testing they should be tied to the enable pins of each motor
-EndStopX = 2
-EndStopY = 3
+EndStopX = 14
+EndStopY = 15
 EndStopZ = 7
 ExtHeater = 10
 HeatBed = 9
@@ -41,8 +41,8 @@ inputs = [EndStopX,EndStopY,EndStopZ];
 #Heat Bed is Channel 1
 CLK  = 8
 MISO = 11
-MOSI = 15
-CS   = 14
+MOSI = 2
+CS   = 3
 mcp = Adafruit_MCP3008.MCP3008(clk=CLK, cs=CS, miso=MISO, mosi=MOSI)
 extChannel = 0
 heatBedChannel = 1
@@ -144,18 +144,18 @@ def getAverageTempFromQue(temp, name):
 
 #polling tempurature and setting to +/- 20degC of supplied tempfrom GCode
 def checkTemps():
-	curExtTemp = getAverageTempFromQue(getTempAtADCChannel(extChannel), "Extruder");#getTempFromTable(ExtThermistor);
-	curHeatBedTemp = getAverageTempFromQue(getTempAtADCChannel(heatBedChannel), "HeatBed");#getTempFromTable(HeatBedThermistor);
+    curExtTemp = getAverageTempFromQue(getTempAtADCChannel(extChannel), "Extruder");#getTempFromTable(ExtThermistor);
+    curHeatBedTemp = getAverageTempFromQue(getTempAtADCChannel(heatBedChannel), "HeatBed");#getTempFromTable(HeatBedThermistor);
     print "Current Extruder temp: "+ curExtTemp;
     print "Current HeatBed temp: " + curHeatBedTemp;
-	if (curExtTemp - 5) >= extTemp:
-		GPIO.output(ExtHeater, False);
-	elif(curExtTemp + 5) <= extTemp:
-		GPIO.output(ExtHeater, True);
-	if (curHeatBedTemp - 5) >= heatBedTemp:
-		GPIO.output(HeatBed, False);
-	elif(curHeatBedTemp + 5) <= heatBedTemp:
-		GPIO.output(HeatBed, True);
+    if (curExtTemp - 2) >= extTemp:
+        GPIO.output(ExtHeater, False);
+    elif(curExtTemp + 2) <= extTemp:
+        GPIO.output(ExtHeater, True);
+    if (curHeatBedTemp - 2) >= heatBedTemp:
+        GPIO.output(HeatBed, False);
+    elif(curHeatBedTemp + 2) <= heatBedTemp:
+        GPIO.output(HeatBed, True);
 
 def PenOff(ZMotor):
     # move ZAxis ~5 steps up
@@ -336,11 +336,11 @@ try:#read and execute G code
             print 'Homing all axis...';
             #move till endstops trigger
             print 'Homing X axis...';
-            #homeAxis(MX,EndStopX)
+            homeAxis(MX,EndStopX)
             print 'Homing Y axis...';
-            #homeAxis(MY,EndStopY)
+            homeAxis(MY,EndStopY)
             print 'Homing Z axis...';
-            #homeAxis(MZ,EndStopZ)
+            homeAxis(MZ,EndStopZ)
             
         elif lines[0:3]=='M05':
             PenOff(MZ)
@@ -502,7 +502,7 @@ try:#read and execute G code
                		moveto(MX,tmp_x_pos,dx,MY, tmp_y_pos,dy,speed,True);
                	else:
                		movetothree(MX,tmp_x_pos,dx,MY, tmp_y_pos,dy,MExt,MExt.position+extruderMovePerStep,dext,speed,True);
-        if heaterCheck >= 10: #checking every fifth extruder motor move 
+        if heaterCheck >= 5: #checking every fifth extruder motor move 
             checkTemps();
             heaterCheck = 0;
             print 'Checking Temps';
@@ -513,7 +513,7 @@ except KeyboardInterrupt:
 #shut off heaters
 GPIO.output(outputs, False);
 #PenOff(MZ);   # turn off laser
-moveto(MX,0,dx,MY,0,dy,50,False);  # move back to Origin
+moveto(MX,0,dx,MY,0,dy,75,False);  # move back to Origin
 
 MX.unhold();
 MY.unhold();
