@@ -148,9 +148,9 @@ def checkTemps():
     curHeatBedTemp = getAverageTempFromQue(getTempAtADCChannel(heatBedChannel), "HeatBed");#getTempFromTable(HeatBedThermistor);
     print "Current Extruder temp: "+ curExtTemp;
     print "Current HeatBed temp: " + curHeatBedTemp;
-    if (curExtTemp - 2) >= extTemp:
+    if curExtTemp >= extTemp:
         GPIO.output(ExtHeater, False);
-    elif(curExtTemp + 2) <= extTemp:
+    elif curExtTemp <= extTemp:
         GPIO.output(ExtHeater, True);
     if (curHeatBedTemp - 2) >= heatBedTemp:
         GPIO.output(HeatBed, False);
@@ -342,7 +342,7 @@ try:#read and execute G code
             print 'Homing Z axis...';
             homeAxis(MZ,EndStopZ)
             
-        elif lines[0:3]=='M05':
+        elif lines[0:3]=='M05': # these will not be used (M05) for the 3D Printer,  I used this code for a pen plotter orginally but I could be used to attach a milling tool
             PenOff(MZ)
             #GPIO.output(Laser_switch,False);
             print 'Pen turned off';
@@ -430,13 +430,13 @@ try:#read and execute G code
                 ext_pos = SinglePosition(lines,'E');
                 stepsExt = int(round(ext_pos/dext)) - MExt.position;
                 #TODO fix this extMotor Delay
-                Motor_control_new.Single_Motor_Step(MExt,stepsExt,40);
+                Motor_control_new.Single_Motor_Step(MExt,stepsExt,speed);
                 #still need to move Extruder using stepExt(signed int)
             elif(lines.find('X') < 0 and lines.find('E') < 0): #Z Axis only
                 print 'Moving Z axis only';
                 z_pos = SinglePosition(lines,'Z');
                 stepsZ = int(round(z_pos/dz)) - MZ.position;
-                Motor_control_new.Single_Motor_Step(MZ,stepsZ,60);
+                Motor_control_new.Single_Motor_Step(MZ,stepsZ,speed);
                 #check Extruder and Heat Bed temp after Z axiz move
                 checkTemps();
             else:                
@@ -503,9 +503,9 @@ try:#read and execute G code
                	else:
                		movetothree(MX,tmp_x_pos,dx,MY, tmp_y_pos,dy,MExt,MExt.position+extruderMovePerStep,dext,speed,True);
         if heaterCheck >= 5: #checking every fifth extruder motor move 
-            checkTemps();
-            heaterCheck = 0;
             print 'Checking Temps';
+            checkTemps();
+            heaterCheck = 0;            
         
 except KeyboardInterrupt:
     pass
@@ -513,7 +513,7 @@ except KeyboardInterrupt:
 #shut off heaters
 GPIO.output(outputs, False);
 #PenOff(MZ);   # turn off laser
-moveto(MX,0,dx,MY,0,dy,75,False);  # move back to Origin
+moveto(MX,0,dx,MY,0,dy,130,False);  # move back to Origin
 
 MX.unhold();
 MY.unhold();
