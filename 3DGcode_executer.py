@@ -16,11 +16,11 @@ import Adafruit_MCP3008
 ################################################################################################
 ################################################################################################
 
-filename='Gcode/cube20hole.gcode'; #file name of the G code commands
+filename='Gcode/pikachu_1gen_flowalistik.gcode'; #file name of the G code commands
 
 GPIO.setmode(GPIO.BCM)
 print GPIO.VERSION
-MX=Bipolar_Stepper_Motor(17,4);     #pin number for a1,a2,b1,b2.  a1 and a2 form coil A; b1 and b2 form coil B
+MX=Bipolar_Stepper_Motor(4,17);     #pin number for a1,a2,b1,b2.  a1 and a2 form coil A; b1 and b2 form coil B
 MY=Bipolar_Stepper_Motor(23,18);
 MZ=Bipolar_Stepper_Motor(24,25);
 MExt=Bipolar_Stepper_Motor(27,22);
@@ -59,7 +59,7 @@ ThermDefaultRes = 10000
 dx=0.2; #resolution in x direction. Unit: mm  http://prusaprinters.org/calculator/
 dy=0.2; #resolution in y direction. Unit: mm  http://prusaprinters.org/calculator/
 dz=0.004; #resolution in Z direction. Unit: mm  http://prusaprinters.org/calculator/
-dext=0.038; # resolution for Extruder Unit: mm http://forums.reprap.org/read.php?1,144245
+dext=0.043; # resolution for Extruder Unit: mm http://forums.reprap.org/read.php?1,144245
 
 
 #Engraving_speed=40; #unit=mm/sec=0.04in/sec
@@ -146,8 +146,8 @@ def getAverageTempFromQue(temp, name):
 def checkTemps():
     curExtTemp = getAverageTempFromQue(getTempAtADCChannel(extChannel), "Extruder");#getTempFromTable(ExtThermistor);
     curHeatBedTemp = getAverageTempFromQue(getTempAtADCChannel(heatBedChannel), "HeatBed");#getTempFromTable(HeatBedThermistor);
-    print "Current Extruder temp: "+ curExtTemp;
-    print "Current HeatBed temp: " + curHeatBedTemp;
+    print "Current Extruder temp: " + str(curExtTemp);
+    print "Current HeatBed temp: " + str(curHeatBedTemp);
     if curExtTemp >= extTemp:
         GPIO.output(ExtHeater, False);
     elif curExtTemp <= extTemp:
@@ -430,13 +430,13 @@ try:#read and execute G code
                 ext_pos = SinglePosition(lines,'E');
                 stepsExt = int(round(ext_pos/dext)) - MExt.position;
                 #TODO fix this extMotor Delay
-                Motor_control_new.Single_Motor_Step(MExt,stepsExt,speed);
+                Motor_control_new.Single_Motor_Step(MExt,stepsExt,speed); #changed from static 40
                 #still need to move Extruder using stepExt(signed int)
             elif(lines.find('X') < 0 and lines.find('E') < 0): #Z Axis only
                 print 'Moving Z axis only';
                 z_pos = SinglePosition(lines,'Z');
                 stepsZ = int(round(z_pos/dz)) - MZ.position;
-                Motor_control_new.Single_Motor_Step(MZ,stepsZ,speed);
+                Motor_control_new.Single_Motor_Step(MZ,stepsZ); #changed from static 60
                 #check Extruder and Heat Bed temp after Z axiz move
                 checkTemps();
             else:                

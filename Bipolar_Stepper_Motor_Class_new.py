@@ -47,8 +47,8 @@ class Bipolar_Stepper_Motor:
     def move(self, dirction, steps, delay=0.009):
         #if(GPIO.gpio_function(self.enable) == GPIO.OUT)
         #    GPIO.setup(self.enable,GPIO.IN);
-        if(delay < 0.005):
-            delay = 0.005;
+        if(delay < 0.003):
+            delay = 0.003;
             
         for _ in range(steps):
             next_phase=(self.phase+dirction) % num_phase;
