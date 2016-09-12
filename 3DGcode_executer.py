@@ -56,10 +56,10 @@ ThermBeta = 3974
 ThermDefaultTempK = 298.15
 ThermDefaultRes = 10000
 
-dx=0.2; #resolution in x direction. Unit: mm  http://prusaprinters.org/calculator/
-dy=0.2; #resolution in y direction. Unit: mm  http://prusaprinters.org/calculator/
+dx=0.198; #resolution in x direction. Unit: mm  http://prusaprinters.org/calculator/
+dy=0.198; #resolution in y direction. Unit: mm  http://prusaprinters.org/calculator/
 dz=0.004; #resolution in Z direction. Unit: mm  http://prusaprinters.org/calculator/
-dext=0.043; # resolution for Extruder Unit: mm http://forums.reprap.org/read.php?1,144245
+dext=0.039; # resolution for Extruder Unit: mm http://forums.reprap.org/read.php?1,144245
 
 
 #Engraving_speed=40; #unit=mm/sec=0.04in/sec
@@ -123,6 +123,8 @@ def sampleHeaterTemp(channel, name):
 def getTempAtADCChannel(channel):
     adcVal = mcp.read_adc(channel);
     Vout = 3.3 * (float(adcVal)/1024);
+    if(Vout == 0 or Vout == 3.3):
+        return 0;
     thermRes = (Vout * 1000)/(3.3 - Vout);
     return ((ThermDefaultTempK * ThermBeta) / log(ThermDefaultRes/thermRes) / (ThermBeta /  log(ThermDefaultRes/thermRes) - ThermDefaultTempK) - 273.15);
 
@@ -502,7 +504,7 @@ try:#read and execute G code
                		moveto(MX,tmp_x_pos,dx,MY, tmp_y_pos,dy,speed,True);
                	else:
                		movetothree(MX,tmp_x_pos,dx,MY, tmp_y_pos,dy,MExt,MExt.position+extruderMovePerStep,dext,speed,True);
-        if heaterCheck >= 5: #checking every fifth extruder motor move 
+        if heaterCheck >= 2: #checking every fifth extruder motor move 
             print 'Checking Temps';
             checkTemps();
             heaterCheck = 0;            
