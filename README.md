@@ -13,4 +13,4 @@ Current limitations:
 
 *Update - Will not be working on the Windows IoT version until the Microsoft makes the IoT OS more user friendly.
 
-*Update - Bahamuttg is working on C++ version of the software with a complete UI in Qt C++.  This will be a for an all in one 3D Printing solution using the Raspberry PI(design, slicing, and printing).
+*Update - Bahamuttg is working on C++ version of the software with a complete UI in Qt C++ called PiRinter3D.  This will be for an all in one 3D Printing solution using the Raspberry PI(design, slicing, and printing).
